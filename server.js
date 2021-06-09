@@ -10,6 +10,9 @@ const PORT = process.env.PORT || 3000;
 connectDb();
 
 nextApp.prepare().then(() => {
+  app.use("/api/signup", require("./api/signup"));
+  app.use("/api/auth", require("./api/auth"));
+
   app.all("*", (req, res) => handle(req, res));
   server.listen(PORT, (err) => {
     if (err) throw err;
