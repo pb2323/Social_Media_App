@@ -1,4 +1,4 @@
-const express = require("express")();
+const express = require("express");
 const router = express.Router();
 const UserModel = require("../models/UserModel");
 const ProfileModel = require("../models/ProfileModel");
@@ -12,6 +12,7 @@ const regexUserName = /^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,29}$/;
 
 router.get("/:username", async (req, res) => {
   const { username } = req.params;
+  console.log(username);
   try {
     if (username.length < 1) return res.status(401).send("Invalid");
     if (!regexUserName.test(username)) return res.status(401).send("Invalid");
@@ -80,7 +81,10 @@ router.post("/", async (req, res) => {
         res.status(200).json(token);
       }
     );
-  } catch (err) {}
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send(`Server error`);
+  }
 });
 
 module.exports = router;

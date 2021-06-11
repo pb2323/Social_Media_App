@@ -104,7 +104,7 @@ function Signup() {
       return setErrorMsg("Error Uploading Image");
     }
 
-    // await registerUser(user, profilePicUrl, setErrorMsg, setFormLoading);
+    await registerUser(user, profilePicUrl, setErrorMsg, setFormLoading);
   };
 
   return (
