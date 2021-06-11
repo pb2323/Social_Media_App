@@ -1,6 +1,8 @@
 import React from "react";
+import baseUrl from "../utils/baseUrl";
+import axios from "axios";
 
-function HomePage() {
+function HomePage({ user, userFollowStats }) {
   return <div>Home Page</div>;
 }
 
