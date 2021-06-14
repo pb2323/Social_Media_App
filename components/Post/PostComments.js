@@ -3,6 +3,7 @@ import calculateTime from "../../utils/calculateTime";
 import { Icon, Comment } from "semantic-ui-react";
 
 function PostComments({ comment, user, postId, setComments }) {
+  const [disabled, setDisabled] = useState(false);
   return (
     <Comment.Group>
       <Comment>

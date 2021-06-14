@@ -27,13 +27,16 @@ function SearchComponent() {
           }),
         });
 
-        if (res.data.length === 0) return setLoading(false);
+        if (res.data.length === 0) setLoading(false);
         setResults(res.data);
       } catch (err) {
         console.log(err);
       }
       setLoading(false);
-    } else setText(value);
+    } else {
+      setText(value);
+      setResults([]);
+    }
   };
 
   return (
