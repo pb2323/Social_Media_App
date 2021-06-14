@@ -20,7 +20,8 @@ router.post("/", authMiddleware, async (req, res) => {
     if (picUrl) newPost.picUrl = picUrl;
     if (location) newPost.location = location;
     const post = await new PostModel(newPost).save();
-    return res.json(post._id);
+    const postCreated = await PostModel.findById(post._id).populate("user");
+    return res.json(postCreated);
   } catch (err) {
     console.log(err);
     return res.status(500).send("Internal Server Error");

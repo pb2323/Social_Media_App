@@ -4,6 +4,7 @@ import { parseCookies, destroyCookie } from "nookies";
 import { redirectUser } from "../utils/authUser";
 import baseUrl from "../utils/baseUrl";
 import Layout from "../components/Layout/Layout";
+import 'react-toastify/dist/ReactToastify.css';
 import "semantic-ui-css/semantic.min.css";
 
 class MyApp extends App {
