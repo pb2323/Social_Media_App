@@ -16,6 +16,8 @@ import Link from "next/link";
 import calculateTime from "../../utils/calculateTime";
 import { deletePost, likePost } from "../../utils/postActions";
 import LikesList from "./LikesList";
+import ImageModal from "./ImageModal";
+import NoImageModal from "./NoImageModal";
 
 function CardPost({ user, post, setPosts, setShowToastr }) {
   const [likes, setLikes] = useState(post.likes);
@@ -24,9 +26,36 @@ function CardPost({ user, post, setPosts, setShowToastr }) {
     likes.filter((like) => like.user === user._id).length > 0;
   const [comments, setComments] = useState(post.comments);
   const [error, setError] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+
+  const addPropsToModal = () => ({
+    post,
+    user,
+    setLikes,
+    likes,
+    isLiked,
+    comments,
+    setComments,
+  });
 
   return (
     <>
+      {showModal && (
+        <Modal
+          open={showModal}
+          closeIcon
+          closeOnDimmerClick
+          onClose={() => setShowModal(false)}
+        >
+          <Modal.Content>
+            {post.picUrl ? (
+              <ImageModal {...addPropsToModal()} />
+            ) : (
+              <NoImageModal {...addPropsToModal()} />
+            )}
+          </Modal.Content>
+        </Modal>
+      )}
       <Segment basic>
         <Card color="teal" fluid>
           {post.picUrl && (
@@ -37,6 +66,7 @@ function CardPost({ user, post, setPosts, setShowToastr }) {
               ui={false}
               alt="PostImage"
               wrapped
+              onClick={() => setShowModal(true)}
             />
           )}
 
@@ -143,7 +173,13 @@ function CardPost({ user, post, setPosts, setShowToastr }) {
               )}
 
             {comments.length > 3 && (
-              <Button color="teal" basic circular content="View More" />
+              <Button
+                color="teal"
+                basic
+                circular
+                content="View More"
+                onClick={() => setShowModal(true)}
+              />
             )}
 
             <Divider hidden />
