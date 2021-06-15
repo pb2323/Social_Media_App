@@ -1,12 +1,13 @@
-import React, { useState, useRef, createRef } from "react";
-import { Form, Image, Icon, Button, Divider, Message } from "semantic-ui-react";
+import React, { useState, useRef } from "react";
+import { Form, Button, Image, Divider, Message, Icon } from "semantic-ui-react";
 import uploadPic from "../../utils/uploadPicToCloudinary";
 import { submitNewPost } from "../../utils/postActions";
 
 function CreatePost({ user, setPosts }) {
   const [newPost, setNewPost] = useState({ text: "", location: "" });
   const [loading, setLoading] = useState(false);
-  const inputRef = createRef();
+  const inputRef = useRef();
+
   const [error, setError] = useState(null);
   const [highlighted, setHighlighted] = useState(false);
 
@@ -15,10 +16,13 @@ function CreatePost({ user, setPosts }) {
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-    if (name === "files") {
+
+    if (name === "media") {
       setMedia(files[0]);
       setMediaPreview(URL.createObjectURL(files[0]));
-    } else setNewPost((prev) => ({ ...prev, [name]: value }));
+    }
+
+    setNewPost((prev) => ({ ...prev, [name]: value }));
   };
 
   const addStyles = () => ({
@@ -34,13 +38,13 @@ function CreatePost({ user, setPosts }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
     let picUrl;
+
     if (media !== null) {
       picUrl = await uploadPic(media);
       if (!picUrl) {
         setLoading(false);
-        return setError("Error uploading Image");
+        return setError("Error Uploading Image");
       }
     }
 
@@ -69,9 +73,9 @@ function CreatePost({ user, setPosts }) {
         />
 
         <Form.Group>
-          <Image src={user.profilePicUrl} avatar circular inline />
+          <Image src={user.profilePicUrl} circular avatar inline />
           <Form.TextArea
-            placeholder="Whats happening"
+            placeholder="Whats Happening"
             name="text"
             value={newPost.text}
             onChange={handleChange}
@@ -82,12 +86,12 @@ function CreatePost({ user, setPosts }) {
 
         <Form.Group>
           <Form.Input
-            placeholder="Want to add a location?"
-            name="location"
             value={newPost.location}
+            name="location"
             onChange={handleChange}
-            icon="map marker alternate"
             label="Add Location"
+            icon="map marker alternate"
+            placeholder="Want to add Location?"
           />
 
           <input
@@ -101,8 +105,8 @@ function CreatePost({ user, setPosts }) {
         </Form.Group>
 
         <div
-          style={addStyles()}
           onClick={() => inputRef.current.click()}
+          style={addStyles()}
           onDrag={(e) => {
             e.preventDefault();
             setHighlighted(true);
@@ -114,7 +118,9 @@ function CreatePost({ user, setPosts }) {
           onDrop={(e) => {
             e.preventDefault();
             setHighlighted(true);
+
             const droppedFile = Array.from(e.dataTransfer.files);
+
             setMedia(droppedFile[0]);
             setMediaPreview(URL.createObjectURL(droppedFile[0]));
           }}
@@ -133,20 +139,18 @@ function CreatePost({ user, setPosts }) {
             </>
           )}
         </div>
-
         <Divider hidden />
 
         <Button
-          loading={loading}
-          icon="send"
-          content={<strong>Post</strong>}
-          disabled={newPost.text === "" || loading}
           circular
+          disabled={newPost.text === "" || loading}
+          content={<strong>Post</strong>}
           style={{ backgroundColor: "#1DA1F2", color: "white" }}
+          icon="send"
+          loading={loading}
         />
-
-        <Divider />
       </Form>
+      <Divider />
     </>
   );
 }

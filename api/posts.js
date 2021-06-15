@@ -136,7 +136,7 @@ router.post("/comment/:postId", authMiddleware, async (req, res) => {
     const { postId } = req.params;
     const { userId } = req;
     const { text } = req.body;
-    if (text.length < 1)
+    if (text && text.length < 1)
       return res.status(401).send("Comment should have atleast one character");
     const post = await PostModel.findById(postId);
     if (!post) return res.status(404).send("Post not found");
