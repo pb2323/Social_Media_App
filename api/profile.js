@@ -5,6 +5,7 @@ const UserModel = require("../models/UserModel");
 const FollowerModel = require("../models/FollowerModel");
 const PostModel = require("../models/PostModel");
 const ProfileModel = require("../models/ProfileModel");
+const bcrypt = require("bcryptjs");
 
 //GET PROFILE INFO
 router.get("/:username", authMiddleware, async (req, res) => {
@@ -37,7 +38,7 @@ router.get("/:username", authMiddleware, async (req, res) => {
 });
 
 //GET POSTS OF A USER
-router.get("/post/:username", authMiddleware, async (req, res) => {
+router.get("/posts/:username", authMiddleware, async (req, res) => {
   const { username } = req.params;
   try {
     const user = await UserModel.findOne({ username: username.toLowerCase() });
@@ -154,5 +155,75 @@ router.put("/unfollow/:userToUnfollowId", authMiddleware, async (req, res) => {
     return res.status(500).send("Internal Server Error");
   }
 });
+
+//UPDATE PROFILE
+router.post("/update", authMiddleware, async (req, res) => {
+  try {
+    const { userId } = req;
+    const { bio, facebook, youtube, twitter, instagram, profilePicUrl } =
+      req.body;
+
+    let profileFields = {};
+    profileFields.user = userId;
+    profileFields.bio = bio;
+    if (facebook) profileFields.facebook = facebook;
+    if (youtube) profileFields.youtube = youtube;
+    if (twitter) profileFields.twitter = twitter;
+    if (instagram) profileFields.instagram = instagram;
+
+    await ProfileModel.updateOne(
+      { user: userId },
+      { $set: profileFields },
+      { new: true }
+    );
+
+    if (profilePicUrl) {
+      const user = await UserModel.findById(userId);
+      user.profilePicUrl = profilePicUrl;
+      await user.save();
+    }
+    return res.status(200).send("Success");
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send("Internal Server Error");
+  }
+});
+
+//UPDATE PASSWORD
+router.post("/settings/password", authMiddleware, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    if (newPassword.length < 6)
+      return res.status(401).send("Password must be atleast 6 characters");
+
+    const user = await UserModel.findById(req.userId).select("+password");
+
+    const isPassword = await bcrypt.compare(currentPassword, user.password);
+    if (!isPassword) return res.status(401).send("Invalid password");
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+
+    return res.status(200).send("Success");
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send("Internal Server Error");
+  }
+});
+
+//UPDATE MESSAGE POPUP SETTINGS
+router.post("/settings/messagePopup", authMiddleware, async (req, res) => {
+  try {
+    const user = await UserModel.findById(req.userId);
+    user.newMessagePopup = !user.newMessagePopup;
+    await user.save();
+    return res.status(200).send("Success");
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send("Internal Server Error");
+  }
+});
+
+
 
 module.exports = router;
