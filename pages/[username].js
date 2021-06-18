@@ -8,7 +8,12 @@ import cookie from "js-cookie";
 import { Grid } from "semantic-ui-react";
 import ProfileMenuTabs from "../components/Profile/ProfileMenuTabs";
 import CardPost from "../components/Post/CardPost";
-import moduleName from '../components/Common/'
+import ProfileHeader from "../components/Profile/ProfileHeader";
+import { PlaceHolderPosts } from "../components/Layout/PlaceHolderGroup";
+import { PostDeleteToastr } from "../components/Layout/Toastr";
+import { NoProfilePosts } from "../components/Layout/NoData";
+import Followers from "../components/Profile/Followers";
+import Following from "../components/Profile/Following";
 
 function ProfilePage({
   profile,
@@ -22,11 +27,11 @@ function ProfilePage({
   const router = useRouter();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [showToastr, setShowToastr] = useState(false);
 
   const [activeItem, setActiveItem] = useState("profile");
   const handleItemClick = (item) => setActiveItem(item);
-  const [loggedUserFollowStats, setLoggedUserFollowStats] =
-    useState(userFollowStats);
+  const [loggedUserFollowStats, setUserFollowStats] = useState(userFollowStats);
 
   const ownAccount = profile.user._id === user._id;
 
@@ -49,20 +54,75 @@ function ProfilePage({
       setLoading(false);
     };
     getPosts();
-  }, []);
+  }, [router.query.username]);
+
+  useEffect(() => {
+    showToastr && setTimeout(() => setShowToastr(false), 3000);
+  }, [showToastr]);
   return (
     <>
+      {showToastr && <PostDeleteToastr />}
       <Grid stackable>
-        <Grid.Column>
-          <ProfileMenuTabs
-            activeItem={activeItem}
-            handleItemClick={handleItemClick}
-            followersLength={followersLength}
-            followingLength={followingLength}
-            loggedUserFollowStats={loggedUserFollowStats}
-            ownAccount={ownAccount}
-          />
-        </Grid.Column>
+        <Grid.Row>
+          <Grid.Column>
+            <ProfileMenuTabs
+              activeItem={activeItem}
+              handleItemClick={handleItemClick}
+              followersLength={followersLength}
+              followingLength={followingLength}
+              loggedUserFollowStats={loggedUserFollowStats}
+              ownAccount={ownAccount}
+            />
+          </Grid.Column>
+        </Grid.Row>
+        <Grid.Row>
+          <Grid.Column>
+            {activeItem === "profile" && (
+              <>
+                <ProfileHeader
+                  profile={profile}
+                  ownAccount={ownAccount}
+                  loggedUserFollowStats={loggedUserFollowStats}
+                  setUserFollowStats={setUserFollowStats}
+                />
+
+                {loading ? (
+                  <PlaceHolderPosts />
+                ) : posts.length > 0 ? (
+                  posts.map((post) => (
+                    <CardPost
+                      key={post._id}
+                      post={post}
+                      user={user}
+                      setPosts={setPosts}
+                      setShowToastr={setShowToastr}
+                    />
+                  ))
+                ) : (
+                  <NoProfilePosts />
+                )}
+              </>
+            )}
+
+            {activeItem === "followers" && (
+              <Followers
+                user={user}
+                loggedUserFollowStats={loggedUserFollowStats}
+                setUserFollowStats={setUserFollowStats}
+                profileUserId={profile.user._id}
+              />
+            )}
+
+            {activeItem === "following" && (
+              <Following
+                user={user}
+                loggedUserFollowStats={loggedUserFollowStats}
+                setUserFollowStats={setUserFollowStats}
+                profileUserId={profile.user._id}
+              />
+            )}
+          </Grid.Column>
+        </Grid.Row>
       </Grid>
     </>
   );
