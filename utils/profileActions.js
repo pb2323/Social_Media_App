@@ -2,6 +2,7 @@ import axios from "axios";
 import baseUrl from "./baseUrl";
 import catchErrors from "./catchErrors";
 import cookie from "js-cookie";
+import Router from "next/router";
 
 const Axios = axios.create({
   baseURL: `${baseUrl}/api/profile`,
@@ -33,5 +34,29 @@ export const unfollowUser = async (userToUnfollowId, setUserFollowStats) => {
     }));
   } catch (err) {
     console.log(catchErrors(err));
+  }
+};
+
+export const profileUpdate = async (
+  profile,
+  setLoading,
+  setError,
+  profilePicUrl
+) => {
+  try {
+    const { bio, youtube, twitter, instagram, facebook } = profile;
+    await Axios.post(`/update`, {
+      bio,
+      facebook,
+      youtube,
+      twitter,
+      instagram,
+      profilePicUrl,
+    });
+    setLoading(false);
+    Router.reload();
+  } catch (err) {
+    setError(catchErrors(err));
+    setLoading(false);
   }
 };

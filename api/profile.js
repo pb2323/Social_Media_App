@@ -166,10 +166,15 @@ router.post("/update", authMiddleware, async (req, res) => {
     let profileFields = {};
     profileFields.user = userId;
     profileFields.bio = bio;
-    if (facebook) profileFields.facebook = facebook;
-    if (youtube) profileFields.youtube = youtube;
-    if (twitter) profileFields.twitter = twitter;
-    if (instagram) profileFields.instagram = instagram;
+    profileFields.social = {};
+
+    if (facebook) profileFields.social.facebook = facebook;
+
+    if (youtube) profileFields.social.youtube = youtube;
+
+    if (instagram) profileFields.social.instagram = instagram;
+
+    if (twitter) profileFields.social.twitter = twitter;
 
     await ProfileModel.updateOne(
       { user: userId },
@@ -223,7 +228,5 @@ router.post("/settings/messagePopup", authMiddleware, async (req, res) => {
     return res.status(500).send("Internal Server Error");
   }
 });
-
-
 
 module.exports = router;

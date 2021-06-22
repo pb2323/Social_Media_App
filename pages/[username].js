@@ -14,6 +14,7 @@ import { PostDeleteToastr } from "../components/Layout/Toastr";
 import { NoProfilePosts } from "../components/Layout/NoData";
 import Followers from "../components/Profile/Followers";
 import Following from "../components/Profile/Following";
+import UpdateProfile from "../components/Profile/UpdateProfile";
 
 function ProfilePage({
   profile,
@@ -120,6 +121,10 @@ function ProfilePage({
                 setUserFollowStats={setUserFollowStats}
                 profileUserId={profile.user._id}
               />
+            )}
+
+            {activeItem === "updateProfile" && (
+              <UpdateProfile Profile={profile} />
             )}
           </Grid.Column>
         </Grid.Row>
