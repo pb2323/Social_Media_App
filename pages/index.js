@@ -20,7 +20,6 @@ function Index({ user, postsData, errorLoading }) {
   const [hasMore, setHasMore] = useState(true);
 
   const [pageNumber, setPageNumber] = useState(2);
-
   useEffect(() => {
     document.title = `Welcome ${user.name.split(" ")[0]}`;
   }, []);
@@ -69,7 +68,7 @@ function Index({ user, postsData, errorLoading }) {
                 setShowToastr={setShowToastr}
               />
             ))}
-          </InfiniteScroll> 
+          </InfiniteScroll>
         )}
       </Segment>
     </>

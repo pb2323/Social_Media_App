@@ -71,7 +71,7 @@ router.post("/", async (req, res) => {
       followers: [],
       following: [],
     }).save();
-    const payload = { user: user._id };
+    const payload = { userId: user._id };
     jwt.sign(
       payload,
       process.env.jwtSecret,

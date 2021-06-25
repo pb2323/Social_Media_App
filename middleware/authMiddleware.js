@@ -7,8 +7,10 @@ module.exports = async (req, res, next) => {
       req.headers.authorization,
       process.env.jwtSecret
     );
-    req.userId = userId;
-    next();
+    if (userId) {
+      req.userId = userId;
+      next();
+    } else throw new Error("UserId not available");
   } catch (err) {
     console.log(err);
     return res.status(401).send("Unauthorized");
