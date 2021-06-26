@@ -46,15 +46,14 @@ export const likePost = async (postId, userId, setLikes, like = true) => {
     if (like) {
       await Axios.post(`/like/${postId}`);
       setLikes((prev) => [...prev, { user: userId }]);
-      return true;
-    } else {
-      await Axios.post(`/unlike/${postId}`);
-      setLikes((prev) => prev.filter((like) => like.user !== userId));
-      return true;
     }
-  } catch (err) {
+    //
+    else if (!like) {
+      await Axios.put(`/unlike/${postId}`);
+      setLikes((prev) => prev.filter((like) => like.user !== userId));
+    }
+  } catch (error) {
     console.log(catchErrors(err));
-    return true;
   }
 };
 
@@ -87,4 +86,3 @@ export const deleteComment = async (postId, commentId, setComments) => {
     return true;
   }
 };
-
