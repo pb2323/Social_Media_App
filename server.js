@@ -1,7 +1,9 @@
 const express = require("express");
 const app = express();
 const server = require("http").Server(app);
+const io = require("socket.io")(server);
 const next = require("next");
+const socket = require("socket.io-client/lib/socket");
 const dev = process.env.NODE_ENV !== "production";
 const nextApp = next({ dev });
 const handle = nextApp.getRequestHandler();
@@ -10,9 +12,26 @@ const connectDb = require("./utilsServer/connectDb");
 connectDb();
 app.use(express.json());
 const PORT = process.env.PORT || 3000;
+const { addUser, removeUser } = require("./utilsServer/roomActions");
+
+io.on("connection", (socket) => {
+  socket.on("join", async ({ userId }) => {
+    const users = await addUser(userId, socket.id);
+    console.log(users);
+
+    setInterval(() => {
+      socket.emit("connectedUsers", {
+        users: users.filter((user) => user.userId !== userId),
+      });
+    }, 10000);
+  });
+
+  socket.on("remove", () => removeUser(socket.id));
+});
 
 nextApp.prepare().then(() => {
   app.use("/api/search", require("./api/search"));
+  app.use("/api/chats", require("./api/chats"));
   app.use("/api/notifications", require("./api/notifications"));
   app.use("/api/signup", require("./api/signup"));
   app.use("/api/profile", require("./api/profile"));
