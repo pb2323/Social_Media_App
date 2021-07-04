@@ -22,6 +22,11 @@ function Messages({ chatsData, errorLoading, user }) {
   const [connectedUsers, setConnectedUsers] = useState([]);
   const socket = useRef();
 
+  const [messages, setMessages] = useState([]);
+  const [bannerData, setBannerData] = useState({ name: "", profilePicUrl: "" });
+
+  const openChatId = useRef();
+
   //CONNECTION useEffect
   useEffect(() => {
     if (!socket.current) {
@@ -49,6 +54,29 @@ function Messages({ chatsData, errorLoading, user }) {
       }
     };
   }, []);
+
+  useEffect(() => {
+    const loadMessage = () => {
+      socket.current.emit("loadMessages", {
+        userId: user._id,
+        messagesWith: router.query.message,
+      });
+
+      socket.on("messagesLoaded", ({ chat }) => {
+        setMessages(chat.messages);
+        setBannerData({
+          name: chat.messagesWith.name,
+          profilePicUrl: chat.messagesWith.profilePicUrl,
+        });
+
+        openChatId.current = chat.messagesWith._id;
+      });
+    };
+
+    if (socket.current) {
+      loadMessage();
+    }
+  }, [router.query.message]);
   return (
     <>
       <Segment padded basic size="large" style={{ marginTop: "5px" }}>

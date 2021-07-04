@@ -13,6 +13,7 @@ connectDb();
 app.use(express.json());
 const PORT = process.env.PORT || 3000;
 const { addUser, removeUser } = require("./utilsServer/roomActions");
+const { loadMessages } = require("./utilsServer/messageActions");
 
 io.on("connection", (socket) => {
   socket.on("join", async ({ userId }) => {
@@ -24,6 +25,14 @@ io.on("connection", (socket) => {
         users: users.filter((user) => user.userId !== userId),
       });
     }, 10000);
+  });
+
+  socket.on("loadMessages", async ({ userId, messagesWith }) => {
+    const { chat, error } = await loadMessages(userId, messagesWith);
+
+    if (!error) {
+      socket.emit("messagesLoaded", { chat });
+    }
   });
 
   socket.on("remove", () => removeUser(socket.id));
