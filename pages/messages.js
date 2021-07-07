@@ -15,6 +15,17 @@ import Chat from "../components/Chats/Chat";
 import ChatListSearch from "../components/Chats/ChatListSearch";
 import { useRouter } from "next/router";
 import { NoMessages } from "../components/Layout/NoData";
+import Banner from "../components/Messages/Banner";
+import Message from "../components/Messages/Message";
+import MessageInputField from "../components/Messages/MessageInputField";
+import getUserInfo from "../utils/getUserInfo";
+import newMsgSound from "../utils/newMsgSound";
+import cookie from "js-cookie";
+
+const scrollDivToBottom = (divRef) => {
+  divRef.current != null &&
+    divRef.current.scrollIntoView({ behaviour: "smooth" });
+};
 
 function Messages({ chatsData, errorLoading, user }) {
   const [chats, setChats] = useState(chatsData);
@@ -24,6 +35,8 @@ function Messages({ chatsData, errorLoading, user }) {
 
   const [messages, setMessages] = useState([]);
   const [bannerData, setBannerData] = useState({ name: "", profilePicUrl: "" });
+
+  const divRef = useRef();
 
   const openChatId = useRef();
 
@@ -55,6 +68,7 @@ function Messages({ chatsData, errorLoading, user }) {
     };
   }, []);
 
+  //LOAD MESSAGE useEffect
   useEffect(() => {
     const loadMessage = () => {
       socket.current.emit("loadMessages", {
@@ -62,7 +76,7 @@ function Messages({ chatsData, errorLoading, user }) {
         messagesWith: router.query.message,
       });
 
-      socket.on("messagesLoaded", ({ chat }) => {
+      socket.current.on("messagesLoaded", ({ chat }) => {
         setMessages(chat.messages);
         setBannerData({
           name: chat.messagesWith.name,
@@ -70,6 +84,15 @@ function Messages({ chatsData, errorLoading, user }) {
         });
 
         openChatId.current = chat.messagesWith._id;
+        divRef.current && scrollDivToBottom(divRef);
+      });
+
+      socket.current.on("noChatFound", async () => {
+        const { name, profilePicUrl } = await getUserInfo(router.query.message);
+        setBannerData({ name, profilePicUrl });
+        setMessages([]);
+
+        openChatId.current = router.query.message;
       });
     };
 
@@ -77,6 +100,122 @@ function Messages({ chatsData, errorLoading, user }) {
       loadMessage();
     }
   }, [router.query.message]);
+
+  const sendMsg = (msg) => {
+    if (socket.current) {
+      socket.current.emit("sendNewMsg", {
+        userId: user._id,
+        msgSendToUserId: openChatId.current,
+        msg,
+      });
+    }
+  };
+
+  //Confirming message is sent and receiving the messages
+  useEffect(() => {
+    if (socket.current) {
+      socket.current.on("msgSent", ({ newMsg }) => {
+        setMessages((prev) => [...prev, newMsg]);
+
+        setChats((prev) => {
+          const previousChat = prev.find(
+            (chat) => chat.messagesWith === newMsg.receiver
+          );
+
+          previousChat.lastMessage = newMsg.msg;
+          previousChat.date = newMsg.date;
+
+          return [...prev];
+        });
+      });
+
+      socket.current.on("newMsgReceived", async ({ newMsg }) => {
+        let senderName;
+        //WHEN CHAT IS OPENED INSIDE YOUR BROWSER
+        if (newMsg.sender === openChatId.current) {
+          setMessages((prev) => [...prev, newMsg]);
+
+          setChats((prev) => {
+            const previousChat = prev.find(
+              (chat) => chat.messagesWith === newMsg.sender
+            );
+            previousChat.lastMessage = newMsg.msg;
+            previousChat.date = newMsg.date;
+            senderName = previousChat.name;
+
+            return [...prev];
+          });
+        } else {
+          const ifPreviouslyMessaged =
+            chats.find((chat) => chat.messagesWith === newMsg.sender).length >
+            0;
+
+          if (ifPreviouslyMessaged) {
+            setChats((prev) => {
+              const previousChat = prev.find(
+                (chat) => chat.messagesWith === newMsg.sender
+              );
+              previousChat.lastMessage = newMsg.msg;
+              previousChat.date = newMsg.date;
+              senderName = previousChat.name;
+              return [...prev];
+            });
+          } else {
+            const { name, profilePicUrl } = await getUserInfo(newMsg.sender);
+            senderName = name;
+            const newChat = {
+              messagesWith: newMsg.sender,
+              name,
+              profilePicUrl,
+              lastMessage: newMsg.msg,
+              date: newMsg.date,
+            };
+
+            setChats((prev) => [newChat, ...prev]);
+          }
+        }
+
+        newMsgSound(senderName);
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    messages.length > 0 && scrollDivToBottom(divRef);
+  }, [messages]);
+
+  const deleteMsg = (messageId) => {
+    if (socket.current) {
+      socket.current.emit("deleteMsg", {
+        userId: user._id,
+        messagesWith: openChatId.current,
+        messageId,
+      });
+
+      socket.current.on("msgDeleted", () => {
+        setMessages((prev) =>
+          prev.filter((message) => message._id !== messageId)
+        );
+      });
+    }
+  };
+
+  const deleteChat = async (messagesWith) => {
+    try {
+      await axios.delete(`${baseUrl}/api/chats/${messagesWith}`, {
+        headers: { Authorization: cookie.get("token") },
+      });
+
+      setChats((prev) =>
+        prev.filter((chat) => chat.messagesWith !== messagesWith)
+      );
+
+      router.push("/messages", undefined, { shallow: true });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <>
       <Segment padded basic size="large" style={{ marginTop: "5px" }}>
@@ -106,11 +245,46 @@ function Messages({ chatsData, errorLoading, user }) {
                         key={i}
                         chat={chat}
                         connectedUsers={connectedUsers}
-                        // deleteChat={deleteChat}
+                        deleteChat={deleteChat}
                       />
                     ))}
                   </Segment>
                 </Comment.Group>
+              </Grid.Column>
+
+              <Grid.Column width={12}>
+                {router.query.message && (
+                  <>
+                    <div
+                      style={{
+                        overflow: "auto",
+                        overflowX: "hidden",
+                        maxHeight: "35rem",
+                        height: "35rem",
+                        backgroundColor: "white",
+                      }}
+                    >
+                      <div style={{ position: "sticky", top: "0" }}>
+                        <Banner bannerData={bannerData} />
+                      </div>
+                      {messages.length > 0 && (
+                        <>
+                          {messages.map((message, i) => (
+                            <Message
+                              key={i}
+                              divRef={divRef}
+                              bannerProfilePic={bannerData.profilePicUrl}
+                              message={message}
+                              user={user}
+                              deleteMsg={deleteMsg}
+                            />
+                          ))}
+                        </>
+                      )}
+                    </div>
+                    <MessageInputField sendMsg={sendMsg} />
+                  </>
+                )}
               </Grid.Column>
             </Grid>
           </>
