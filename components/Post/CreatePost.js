@@ -7,7 +7,7 @@ function CreatePost({ user, setPosts }) {
   const [newPost, setNewPost] = useState({ text: "", location: "" });
   const [loading, setLoading] = useState(false);
   const inputRef = useRef();
-
+  console.log("INSIDE");
   const [error, setError] = useState(null);
   const [highlighted, setHighlighted] = useState(false);
 

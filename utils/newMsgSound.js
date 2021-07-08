@@ -1,5 +1,6 @@
 const newMsgSound = (senderName) => {
   const sound = new Audio("/light.mp3");
+
   sound && sound.play();
 
   if (senderName) {

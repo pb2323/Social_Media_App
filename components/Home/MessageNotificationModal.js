@@ -8,21 +8,21 @@ function MessageNotificationModal({
   showNewMessageModal,
   newMessageModal,
   newMessageReceived,
-  user
+  user,
 }) {
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
 
   const onModalClose = () => showNewMessageModal(false);
 
-  const formSubmit = e => {
+  const formSubmit = (e) => {
     e.preventDefault();
 
     if (socket.current) {
       socket.current.emit("sendMsgFromNotification", {
         userId: user._id,
         msgSendToUserId: newMessageReceived.sender,
-        msg: text
+        msg: text,
       });
 
       socket.current.on("msgSentFromNotification", () => {
@@ -40,17 +40,24 @@ function MessageNotificationModal({
         closeIcon
         closeOnDimmerClick
       >
-        <Modal.Header content={`New Message from ${newMessageReceived.senderName}`} />
+        <Modal.Header
+          content={`New Message from ${newMessageReceived.senderName}`}
+        />
 
         <Modal.Content>
           <div className="bubbleWrapper">
             <div className="inlineContainer">
-              <img className="inlineIcon" src={newMessageReceived.senderProfilePic} />
+              <img
+                className="inlineIcon"
+                src={newMessageReceived.senderProfilePic}
+              />
             </div>
 
             <div className="otherBubble other">{newMessageReceived.msg}</div>
 
-            <span className="other">{calculateTime(newMessageReceived.date)}</span>
+            <span className="other">
+              {calculateTime(newMessageReceived.date)}
+            </span>
           </div>
 
           <div style={{ position: "sticky", bottom: "0px" }}>
@@ -60,12 +67,12 @@ function MessageNotificationModal({
                   size="large"
                   placeholder="Send New Message"
                   value={text}
-                  onChange={e => setText(e.target.value)}
+                  onChange={(e) => setText(e.target.value)}
                   action={{
                     color: "blue",
                     icon: "telegram plane",
                     disabled: text === "",
-                    loading: loading
+                    loading: loading,
                   }}
                 />
               </Form>
@@ -93,7 +100,8 @@ const Instructions = ({ username }) => (
       <Icon name="help" />
       <List.Content>
         <List.Header>
-          If you do not like this popup to appear when you receive a new message:
+          If you do not like this popup to appear when you receive a new
+          message:
         </List.Header>
       </List.Content>
     </List.Item>

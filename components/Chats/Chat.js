@@ -1,10 +1,11 @@
 import React from "react";
-import { useRouter } from "next/router";
 import { Divider, Comment, Icon, List } from "semantic-ui-react";
+import { useRouter } from "next/router";
 import calculateTime from "../../utils/calculateTime";
 
 function Chat({ chat, connectedUsers, deleteChat }) {
   const router = useRouter();
+
   const isOnline =
     connectedUsers.length > 0 &&
     connectedUsers.filter((user) => user.userId === chat.messagesWith).length >
@@ -48,7 +49,7 @@ function Chat({ chat, connectedUsers, deleteChat }) {
 
               <Comment.Text>
                 {chat.lastMessage.length > 20
-                  ? `${chat.lastMessage.substring(0, 20)}...`
+                  ? `${chat.lastMessage.substring(0, 20)} ...`
                   : chat.lastMessage}
               </Comment.Text>
             </Comment.Content>

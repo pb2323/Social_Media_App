@@ -9,8 +9,8 @@ const getUserInfo = async (userToFindId) => {
     });
 
     return { name: res.data.name, profilePicUrl: res.data.profilePicUrl };
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error(error);
   }
 };
 

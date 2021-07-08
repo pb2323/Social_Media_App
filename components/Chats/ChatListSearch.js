@@ -4,7 +4,6 @@ import axios from "axios";
 import cookie from "js-cookie";
 import { useRouter } from "next/router";
 import baseUrl from "../../utils/baseUrl";
-import { route } from "next/dist/next-server/server/router";
 let cancel;
 
 function ChatListSearch({ chats, setChats }) {
@@ -15,39 +14,41 @@ function ChatListSearch({ chats, setChats }) {
 
   const handleChange = async (e) => {
     const { value } = e.target;
-    if (value && value.length > 0) {
-      setText(value);
-      setLoading(true);
-      try {
-        cancel && cancel();
-        const CancelToken = axios.CancelToken;
-        const token = cookie.get("token");
-        const res = await axios.get(`${baseUrl}/api/search/${value}`, {
-          headers: { Authorization: token },
-          cancelToken: new CancelToken((canceller) => {
-            cancel = canceller;
-          }),
-        });
+    setText(value);
+    setLoading(true);
 
-        if (res.data.length === 0) setLoading(false);
-        setResults(res.data);
-      } catch (err) {
-        console.log(err);
-      }
-      setLoading(false);
-    } else {
-      setText(value);
-      setResults([]);
+    try {
+      cancel && cancel();
+      const CancelToken = axios.CancelToken;
+      const token = cookie.get("token");
+
+      const res = await axios.get(`${baseUrl}/api/search/${value}`, {
+        headers: { Authorization: token },
+        cancelToken: new CancelToken((canceler) => {
+          cancel = canceler;
+        }),
+      });
+
+      if (res.data.length === 0) return setLoading(false);
+
+      setResults(res.data);
+    } catch (error) {
+      alert("Error Searching");
     }
+
+    setLoading(false);
   };
 
   const addChat = (result) => {
     const alreadyInChat =
       chats.length > 0 &&
-      chats.filter((chat) => chat.messagesWith === result._id).length > 0;
+      chats.filter((chat) => chat.messsagesWith === result._id).length > 0;
+
     if (alreadyInChat) {
       return router.push(`/messages?message=${result._id}`);
-    } else {
+    }
+    //
+    else {
       const newChat = {
         messagesWith: result._id,
         name: result.name,
@@ -57,6 +58,7 @@ function ChatListSearch({ chats, setChats }) {
       };
 
       setChats((prev) => [newChat, ...prev]);
+
       return router.push(`/messages?message=${result._id}`);
     }
   };
@@ -83,7 +85,7 @@ const ResultRenderer = ({ _id, profilePicUrl, name }) => {
   return (
     <List key={_id}>
       <List.Item>
-        <Image src={profilePicUrl} avatar alt="ProfilePic" />
+        <Image src={profilePicUrl} alt="ProfilePic" avatar />
         <List.Content header={name} as="a" />
       </List.Item>
     </List>

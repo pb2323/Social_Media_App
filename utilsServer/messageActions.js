@@ -11,27 +11,29 @@ const loadMessages = async (userId, messagesWith) => {
       (chat) => chat.messagesWith._id.toString() === messagesWith
     );
 
-    if (!chat) return { error: "No chat found" };
+    if (!chat) {
+      return { error: "No chat found" };
+    }
 
     return { chat };
-  } catch (err) {
-    console.log(err);
+  } catch (error) {
+    console.log(error);
     return { error };
   }
 };
 
 const sendMsg = async (userId, msgSendToUserId, msg) => {
   try {
-    //LOGGED IN USER(SENDER)
+    // LOGGED IN USER (SENDER)
     const user = await ChatModel.findOne({ user: userId });
 
-    //RECEIVER
+    // RECEIVER
     const msgSendToUser = await ChatModel.findOne({ user: msgSendToUserId });
 
     const newMsg = {
-      msg,
       sender: userId,
       receiver: msgSendToUserId,
+      msg,
       date: Date.now(),
     };
 
@@ -42,12 +44,10 @@ const sendMsg = async (userId, msgSendToUserId, msg) => {
     if (previousChat) {
       previousChat.messages.push(newMsg);
       await user.save();
-    } else {
-      const newChat = {
-        messagesWith: msgSendToUserId,
-        messages: [newMsg],
-      };
-
+    }
+    //
+    else {
+      const newChat = { messagesWith: msgSendToUserId, messages: [newMsg] };
       user.chats.unshift(newChat);
       await user.save();
     }
@@ -59,20 +59,18 @@ const sendMsg = async (userId, msgSendToUserId, msg) => {
     if (previousChatForReceiver) {
       previousChatForReceiver.messages.push(newMsg);
       await msgSendToUser.save();
-    } else {
-      const newChat = {
-        messagesWith: userId,
-        messages: [newMsg],
-      };
-
+    }
+    //
+    else {
+      const newChat = { messagesWith: userId, messages: [newMsg] };
       msgSendToUser.chats.unshift(newChat);
       await msgSendToUser.save();
     }
 
     return { newMsg };
-  } catch (err) {
-    console.error(err);
-    return { err };
+  } catch (error) {
+    console.error(error);
+    return { error };
   }
 };
 
@@ -86,8 +84,8 @@ const setMsgToUnread = async (userId) => {
     }
 
     return;
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error(error);
   }
 };
 
@@ -105,19 +103,24 @@ const deleteMsg = async (userId, messagesWith, messageId) => {
       (message) => message._id.toString() === messageId
     );
 
-    if (messageToDelete.sender.toString() !== userId) return;
+    if (!messageToDelete) return;
+
+    if (messageToDelete.sender.toString() !== userId) {
+      return;
+    }
 
     const indexOf = chat.messages
       .map((message) => message._id.toString())
       .indexOf(messageToDelete._id.toString());
 
     await chat.messages.splice(indexOf, 1);
+
     await user.save();
 
     return { success: true };
-  } catch (err) {
-    console.error(err);
-    return;
+  } catch (error) {
+    console.log(error);
   }
 };
+
 module.exports = { loadMessages, sendMsg, setMsgToUnread, deleteMsg };

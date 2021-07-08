@@ -1,69 +1,75 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import axios from "axios";
 import baseUrl from "../utils/baseUrl";
-import { useRouter } from "next/router";
-import { NoProfile } from "../components/Layout/NoData";
 import { parseCookies } from "nookies";
-import cookie from "js-cookie";
 import { Grid } from "semantic-ui-react";
-import ProfileMenuTabs from "../components/Profile/ProfileMenuTabs";
+import { NoProfilePosts, NoProfile } from "../components/Layout/NoData";
 import CardPost from "../components/Post/CardPost";
-import ProfileHeader from "../components/Profile/ProfileHeader";
+import cookie from "js-cookie";
 import { PlaceHolderPosts } from "../components/Layout/PlaceHolderGroup";
-import { PostDeleteToastr } from "../components/Layout/Toastr";
-import { NoProfilePosts } from "../components/Layout/NoData";
+import ProfileMenuTabs from "../components/Profile/ProfileMenuTabs";
+import ProfileHeader from "../components/Profile/ProfileHeader";
 import Followers from "../components/Profile/Followers";
 import Following from "../components/Profile/Following";
 import UpdateProfile from "../components/Profile/UpdateProfile";
 import Settings from "../components/Profile/Settings";
+import { PostDeleteToastr } from "../components/Layout/Toastr";
 
 function ProfilePage({
+  errorLoading,
   profile,
   followersLength,
   followingLength,
-  errorLoading,
   user,
   userFollowStats,
 }) {
-  if (errorLoading) return <NoProfile />;
   const router = useRouter();
+
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showToastr, setShowToastr] = useState(false);
 
   const [activeItem, setActiveItem] = useState("profile");
-  const handleItemClick = (item) => setActiveItem(item);
+  const handleItemClick = (clickedTab) => setActiveItem(clickedTab);
+
   const [loggedUserFollowStats, setUserFollowStats] = useState(userFollowStats);
 
   const ownAccount = profile.user._id === user._id;
 
+  if (errorLoading) return <NoProfile />;
+
   useEffect(() => {
     const getPosts = async () => {
       setLoading(true);
+
       try {
         const { username } = router.query;
-        const token = cookie.get("token");
-
         const res = await axios.get(
           `${baseUrl}/api/profile/posts/${username}`,
-          { headers: { Authorization: token } }
+          {
+            headers: { Authorization: cookie.get("token") },
+          }
         );
 
         setPosts(res.data);
-      } catch (err) {
-        console.log(err);
+      } catch (error) {
+        alert("Error Loading Posts");
       }
+
       setLoading(false);
     };
     getPosts();
   }, [router.query.username]);
 
   useEffect(() => {
-    showToastr && setTimeout(() => setShowToastr(false), 3000);
+    showToastr && setTimeout(() => setShowToastr(false), 4000);
   }, [showToastr]);
+
   return (
     <>
       {showToastr && <PostDeleteToastr />}
+
       <Grid stackable>
         <Grid.Row>
           <Grid.Column>
@@ -72,11 +78,12 @@ function ProfilePage({
               handleItemClick={handleItemClick}
               followersLength={followersLength}
               followingLength={followingLength}
-              loggedUserFollowStats={loggedUserFollowStats}
               ownAccount={ownAccount}
+              loggedUserFollowStats={loggedUserFollowStats}
             />
           </Grid.Column>
         </Grid.Row>
+
         <Grid.Row>
           <Grid.Column>
             {activeItem === "profile" && (
@@ -150,7 +157,7 @@ ProfilePage.getInitialProps = async (ctx) => {
     const { profile, followersLength, followingLength } = res.data;
 
     return { profile, followersLength, followingLength };
-  } catch (err) {
+  } catch (error) {
     return { errorLoading: true };
   }
 };

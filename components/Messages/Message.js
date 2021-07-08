@@ -4,6 +4,7 @@ import calculateTime from "../../utils/calculateTime";
 
 function Message({ message, user, deleteMsg, bannerProfilePic, divRef }) {
   const [deleteIcon, showDeleteIcon] = useState(false);
+
   const ifYouSender = message.sender === user._id;
 
   return (
@@ -16,6 +17,7 @@ function Message({ message, user, deleteMsg, bannerProfilePic, divRef }) {
           className="inlineIcon"
           src={ifYouSender ? user.profilePicUrl : bannerProfilePic}
         />
+
         <div className={ifYouSender ? "ownBubble own" : "otherBubble other"}>
           {message.msg}
         </div>
@@ -36,7 +38,7 @@ function Message({ message, user, deleteMsg, bannerProfilePic, divRef }) {
         )}
       </div>
 
-      <span className={ifYouSender ? "own" : "sender"}>
+      <span className={ifYouSender ? "own" : "other"}>
         {calculateTime(message.date)}
       </span>
     </div>
