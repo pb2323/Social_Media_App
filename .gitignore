@@ -3,4 +3,4 @@ config.env
 # next.js build output
 .next
 
-next.config.js
+# next.config.js
