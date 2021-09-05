@@ -15,6 +15,7 @@ function ChatListSearch({ chats, setChats }) {
   const handleChange = async (e) => {
     const { value } = e.target;
     setText(value);
+    if (!value || value === "") return;
     setLoading(true);
 
     try {
