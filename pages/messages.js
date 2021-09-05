@@ -217,7 +217,7 @@ function Messages({ chatsData, user }) {
       );
       router.push("/messages", undefined, { shallow: true });
     } catch (error) {
-      alert("Error deleting chat");
+      console.error("Error deleting chat");
     }
   };
 

@@ -1,9 +1,9 @@
 import React from "react";
-import { Modal, Grid, Image, Card, Icon, Divider } from "semantic-ui-react";
+import { Modal, Image, Card, Icon, Divider } from "semantic-ui-react";
 import PostComments from "./PostComments";
 import CommentInputField from "./CommentInputField";
-import Link from "next/link";
 import calculateTime from "../../utils/calculateTime";
+import Link from "next/link";
 import { likePost } from "../../utils/postActions";
 import LikesList from "./LikesList";
 
@@ -20,8 +20,9 @@ function NoImageModal({
     <Card fluid>
       <Card.Content>
         <Image floated="left" avatar src={post.user.profilePicUrl} />
+
         <Card.Header>
-          <Link href={`${post.user.username}`}>
+          <Link href={`/${post.user.username}`}>
             <a>{post.user.name}</a>
           </Link>
         </Card.Header>
@@ -46,22 +47,24 @@ function NoImageModal({
           name={isLiked ? "heart" : "heart outline"}
           color="red"
           style={{ cursor: "pointer" }}
-          onClick={async () =>
-            await likePost(post._id, user._id, setLikes, isLiked ? false : true)
+          onClick={() =>
+            likePost(post._id, user._id, setLikes, isLiked ? false : true)
           }
         />
+
         <LikesList
           postId={post._id}
           trigger={
             likes.length > 0 && (
-              <span className="spanLikesList">{`${likes.length} ${
-                likes.length > 1 ? "likes" : "like"
-              }`}</span>
+              <span className="spanLikesList">
+                {`${likes.length} ${likes.length === 1 ? "like" : "likes"}`}
+              </span>
             )
           }
         />
 
         <Divider hidden />
+
         <div
           style={{
             overflow: "auto",
@@ -70,7 +73,7 @@ function NoImageModal({
           }}
         >
           {comments.length > 0 &&
-            comments.map((comment, i) => (
+            comments.map((comment) => (
               <PostComments
                 key={comment._id}
                 comment={comment}
@@ -80,6 +83,7 @@ function NoImageModal({
               />
             ))}
         </div>
+
         <CommentInputField
           postId={post._id}
           user={user}

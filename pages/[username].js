@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import io from "socket.io-client";
 import { useRouter } from "next/router";
 import axios from "axios";
 import baseUrl from "../utils/baseUrl";
@@ -54,7 +55,7 @@ function ProfilePage({
 
         setPosts(res.data);
       } catch (error) {
-        alert("Error Loading Posts");
+        console.error("Error Loading Posts");
       }
 
       setLoading(false);
@@ -65,6 +66,25 @@ function ProfilePage({
   useEffect(() => {
     showToastr && setTimeout(() => setShowToastr(false), 4000);
   }, [showToastr]);
+
+  const socket = useRef();
+
+  useEffect(() => {
+    if (!socket.current) {
+      socket.current = io(baseUrl);
+    }
+
+    if (socket.current) {
+      socket.current.emit("join", { userId: user._id });
+    }
+
+    return () => {
+      if (socket.current) {
+        socket.current.emit("disconnect");
+        socket.current.off();
+      }
+    };
+  }, []);
 
   return (
     <>
@@ -100,6 +120,7 @@ function ProfilePage({
                 ) : posts.length > 0 ? (
                   posts.map((post) => (
                     <CardPost
+                      socket={socket}
                       key={post._id}
                       post={post}
                       user={user}

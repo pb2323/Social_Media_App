@@ -17,8 +17,8 @@ export const followUser = async (userToFollowId, setUserFollowStats) => {
       ...prev,
       following: [...prev.following, { user: userToFollowId }],
     }));
-  } catch (err) {
-    console.log(catchErrors(err));
+  } catch (error) {
+    console.error(catchErrors(error));
   }
 };
 
@@ -32,8 +32,8 @@ export const unfollowUser = async (userToUnfollowId, setUserFollowStats) => {
         (following) => following.user !== userToUnfollowId
       ),
     }));
-  } catch (err) {
-    console.log(catchErrors(err));
+  } catch (error) {
+    console.error(catchErrors(error));
   }
 };
 
@@ -44,7 +44,8 @@ export const profileUpdate = async (
   profilePicUrl
 ) => {
   try {
-    const { bio, youtube, twitter, instagram, facebook } = profile;
+    const { bio, facebook, youtube, twitter, instagram } = profile;
+
     await Axios.post(`/update`, {
       bio,
       facebook,
@@ -53,23 +54,23 @@ export const profileUpdate = async (
       instagram,
       profilePicUrl,
     });
+
     setLoading(false);
     Router.reload();
-  } catch (err) {
-    setError(catchErrors(err));
+  } catch (error) {
+    setError(catchErrors(error));
     setLoading(false);
   }
 };
 
 export const passwordUpdate = async (setSuccess, userPasswords) => {
+  const { currentPassword, newPassword } = userPasswords;
   try {
-    const { currentPassword, newPassword } = userPasswords;
     await Axios.post(`/settings/password`, { currentPassword, newPassword });
+
     setSuccess(true);
-    return true;
-  } catch (err) {
-    console.log(catchErrors(err));
-    return false;
+  } catch (error) {
+    console.error(catchErrors(error));
   }
 };
 
@@ -80,10 +81,10 @@ export const toggleMessagePopup = async (
 ) => {
   try {
     await Axios.post(`/settings/messagePopup`);
+
     setPopupSetting(!popupSetting);
     setSuccess(true);
-  } catch (err) {
-    console.log(catchErrors(err));
-    return false;
+  } catch (error) {
+    console.error(catchErrors(error));
   }
 };

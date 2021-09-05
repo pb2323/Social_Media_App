@@ -6,58 +6,36 @@ function ProfileMenuTabs({
   handleItemClick,
   followersLength,
   followingLength,
-  loggedUserFollowStats,
   ownAccount,
+  loggedUserFollowStats,
 }) {
   return (
     <>
-      <Menu secondary pointing>
+      <Menu pointing secondary>
         <Menu.Item
           name="profile"
           active={activeItem === "profile"}
           onClick={() => handleItemClick("profile")}
         />
 
+        <Menu.Item
+          name={`${followersLength} followers`}
+          active={activeItem === "followers"}
+          onClick={() => handleItemClick("followers")}
+        />
+
         {ownAccount ? (
           <>
-            <Menu.Item
-              name={`${
-                loggedUserFollowStats.followers.length > 0
-                  ? loggedUserFollowStats.followers.length
-                  : 0
-              } Followers`}
-              active={activeItem === "followers"}
-              onClick={() => handleItemClick("followers")}
-            />
-
             <Menu.Item
               name={`${
                 loggedUserFollowStats.following.length > 0
                   ? loggedUserFollowStats.following.length
                   : 0
-              } Following`}
+              } following`}
               active={activeItem === "following"}
               onClick={() => handleItemClick("following")}
             />
-          </>
-        ) : (
-          <>
-            <Menu.Item
-              name={`${followersLength} Followers`}
-              active={activeItem === "followers"}
-              onClick={() => handleItemClick("followers")}
-            />
 
-            <Menu.Item
-              name={`${followingLength} Following`}
-              active={activeItem === "following"}
-              onClick={() => handleItemClick("following")}
-            />
-          </>
-        )}
-
-        {ownAccount && (
-          <>
             <Menu.Item
               name="Update Profile"
               active={activeItem === "updateProfile"}
@@ -65,11 +43,17 @@ function ProfileMenuTabs({
             />
 
             <Menu.Item
-              name="Settings"
+              name="settings"
               active={activeItem === "settings"}
               onClick={() => handleItemClick("settings")}
             />
           </>
+        ) : (
+          <Menu.Item
+            name={`${followingLength} following`}
+            active={activeItem === "following"}
+            onClick={() => handleItemClick("following")}
+          />
         )}
       </Menu>
     </>

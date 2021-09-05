@@ -1,22 +1,23 @@
 import React, { useState, useEffect, useRef } from "react";
 import {
-  Form,
-  Button,
+  List,
   Divider,
   Message,
-  List,
   Checkbox,
+  Form,
+  Button,
 } from "semantic-ui-react";
 import { passwordUpdate, toggleMessagePopup } from "../../utils/profileActions";
 
 function Settings({ newMessagePopup }) {
-  const [showUpdatePassword, setShowUpdatePassword] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [passwordFields, showPasswordFields] = useState(false);
 
-  const [showMessageSettings, setShowMessageSettings] = useState(false);
+  const [newMessageSettings, showNewMessageSettings] = useState(false);
+
+  const isFirstRun = useRef(true);
   const [popupSetting, setPopupSetting] = useState(newMessagePopup);
 
-  let isFirstRun = useRef(true);
+  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     success && setTimeout(() => setSuccess(false), 3000);
@@ -24,7 +25,7 @@ function Settings({ newMessagePopup }) {
 
   useEffect(() => {
     if (isFirstRun.current) {
-      isFirstRun = false;
+      isFirstRun.current = false;
       return;
     }
   }, [popupSetting]);
@@ -33,7 +34,7 @@ function Settings({ newMessagePopup }) {
     <>
       {success && (
         <>
-          <Message icon="check circle" header="Updated successfully" success />
+          <Message success icon="check circle" header="Updated Successfully" />
           <Divider hidden />
         </>
       )}
@@ -43,19 +44,19 @@ function Settings({ newMessagePopup }) {
           <List.Icon name="user secret" size="large" verticalAlign="middle" />
           <List.Content>
             <List.Header
+              onClick={() => showPasswordFields(!passwordFields)}
               as="a"
-              onClick={() => setShowUpdatePassword(!showUpdatePassword)}
               content="Update Password"
             />
           </List.Content>
-          {showUpdatePassword && (
+
+          {passwordFields && (
             <UpdatePassword
               setSuccess={setSuccess}
-              setShowUpdatePassword={setShowUpdatePassword}
+              showPasswordFields={showPasswordFields}
             />
           )}
         </List.Item>
-
         <Divider />
 
         <List.Item>
@@ -64,52 +65,52 @@ function Settings({ newMessagePopup }) {
             size="large"
             verticalAlign="middle"
           />
+
           <List.Content>
             <List.Header
+              onClick={() => showNewMessageSettings(!newMessageSettings)}
               as="a"
-              content="Show New Message Popup"
-              onClick={() => setShowMessageSettings(!showMessageSettings)}
+              content="Show New Message Popup?"
             />
           </List.Content>
 
-          {showMessageSettings && (
-            <div style={{ marginTop: "10px" }}>
-              Control whether a Popup should appear when there is a new Message
-              <br />
-              <Checkbox
-                checked={popupSetting}
-                toggle
-                onChange={async () => {
-                  await toggleMessagePopup(
-                    popupSetting,
-                    setPopupSetting,
-                    setSuccess
-                  );
-                }}
-              />
-            </div>
-          )}
+          <div style={{ marginTop: "10px" }}>
+            Control whether a Popup should appear when there is a New Message or
+            not.
+            <br />
+            <br />
+            <Checkbox
+              checked={popupSetting}
+              toggle
+              onChange={() =>
+                toggleMessagePopup(popupSetting, setPopupSetting, setSuccess)
+              }
+            />
+          </div>
         </List.Item>
+
+        <Divider />
       </List>
     </>
   );
 }
 
-const UpdatePassword = ({ setSuccess, setShowUpdatePassword }) => {
+const UpdatePassword = ({ setSuccess, showPasswordFields }) => {
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setError] = useState(null);
+
   const [userPasswords, setUserPasswords] = useState({
     currentPassword: "",
     newPassword: "",
   });
-  const [showTypedPasswords, setShowTypedPasswords] = useState({
+  const [typed, showTyped] = useState({
     field1: false,
     field2: false,
   });
 
-  const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState(null);
+  const { field1, field2 } = typed;
 
   const { currentPassword, newPassword } = userPasswords;
-  const { field1, field2 } = showTypedPasswords;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -117,7 +118,7 @@ const UpdatePassword = ({ setSuccess, setShowUpdatePassword }) => {
   };
 
   useEffect(() => {
-    errorMsg !== null && setTimeout(() => setErrorMsg(null), 5000);
+    errorMsg && setTimeout(() => setError(null), 5000);
   }, [errorMsg]);
 
   return (
@@ -128,9 +129,11 @@ const UpdatePassword = ({ setSuccess, setShowUpdatePassword }) => {
         onSubmit={async (e) => {
           e.preventDefault();
           setLoading(true);
+
           await passwordUpdate(setSuccess, userPasswords);
           setLoading(false);
-          setShowUpdatePassword(false);
+
+          showPasswordFields(false);
         }}
       >
         <List.List>
@@ -142,15 +145,12 @@ const UpdatePassword = ({ setSuccess, setShowUpdatePassword }) => {
                 circular: true,
                 link: true,
                 onClick: () =>
-                  setShowTypedPasswords((prev) => ({
-                    ...prev,
-                    field1: !field1,
-                  })),
+                  showTyped((prev) => ({ ...prev, field1: !field1 })),
               }}
               type={field1 ? "text" : "password"}
               iconPosition="left"
               label="Current Password"
-              placeholder="Enter Current Password"
+              placeholder="Enter current Password"
               name="currentPassword"
               onChange={handleChange}
               value={currentPassword}
@@ -163,10 +163,7 @@ const UpdatePassword = ({ setSuccess, setShowUpdatePassword }) => {
                 circular: true,
                 link: true,
                 onClick: () =>
-                  setShowTypedPasswords((prev) => ({
-                    ...prev,
-                    field2: !field2,
-                  })),
+                  showTyped((prev) => ({ ...prev, field2: !field2 })),
               }}
               type={field2 ? "text" : "password"}
               iconPosition="left"
@@ -176,6 +173,8 @@ const UpdatePassword = ({ setSuccess, setShowUpdatePassword }) => {
               onChange={handleChange}
               value={newPassword}
             />
+
+            {/* BUTTONS */}
 
             <Button
               disabled={loading || currentPassword === "" || newPassword === ""}
@@ -190,15 +189,15 @@ const UpdatePassword = ({ setSuccess, setShowUpdatePassword }) => {
               disabled={loading}
               compact
               icon="cancel"
+              type="button"
               content="Cancel"
-              onClick={() => setShowUpdatePassword(false)}
+              onClick={() => showPasswordFields(false)}
             />
 
-            <Message error icon="meh" header="Oops" content={errorMsg} />
+            <Message icon="meh" error header="Oops!" content={errorMsg} />
           </List.Item>
         </List.List>
       </Form>
-
       <Divider hidden />
     </>
   );

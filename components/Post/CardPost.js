@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
-  Icon,
   Card,
+  Icon,
   Image,
   Divider,
   Segment,
@@ -12,20 +12,24 @@ import {
 } from "semantic-ui-react";
 import PostComments from "./PostComments";
 import CommentInputField from "./CommentInputField";
-import Link from "next/link";
 import calculateTime from "../../utils/calculateTime";
+import Link from "next/link";
 import { deletePost, likePost } from "../../utils/postActions";
 import LikesList from "./LikesList";
 import ImageModal from "./ImageModal";
 import NoImageModal from "./NoImageModal";
 
-function CardPost({ user, post, setPosts, setShowToastr }) {
+function CardPost({ post, user, setPosts, setShowToastr, socket }) {
   const [likes, setLikes] = useState(post.likes);
+
   const isLiked =
     likes.length > 0 &&
     likes.filter((like) => like.user === user._id).length > 0;
+
   const [comments, setComments] = useState(post.comments);
+
   const [error, setError] = useState(null);
+
   const [showModal, setShowModal] = useState(false);
 
   const addPropsToModal = () => ({
@@ -56,6 +60,7 @@ function CardPost({ user, post, setPosts, setShowToastr }) {
           </Modal.Content>
         </Modal>
       )}
+
       <Segment basic>
         <Card color="teal" fluid>
           {post.picUrl && (
@@ -63,9 +68,9 @@ function CardPost({ user, post, setPosts, setShowToastr }) {
               src={post.picUrl}
               style={{ cursor: "pointer" }}
               floated="left"
+              wrapped
               ui={false}
               alt="PostImage"
-              wrapped
               onClick={() => setShowModal(true)}
             />
           )}
@@ -78,7 +83,7 @@ function CardPost({ user, post, setPosts, setShowToastr }) {
               circular
             />
 
-            {(user.role === "root" || user._id === post.user._id) && (
+            {(user.role === "root" || post.user._id === user._id) && (
               <>
                 <Popup
                   on="click"
@@ -92,13 +97,14 @@ function CardPost({ user, post, setPosts, setShowToastr }) {
                     />
                   }
                 >
-                  <Header as="h4" content="Are you sure" />
+                  <Header as="h4" content="Are you sure?" />
                   <p>This action is irreversible!</p>
+
                   <Button
                     color="red"
                     icon="trash"
                     content="Delete"
-                    onClick={async () =>
+                    onClick={() =>
                       deletePost(post._id, setPosts, setShowToastr)
                     }
                   />
@@ -107,7 +113,7 @@ function CardPost({ user, post, setPosts, setShowToastr }) {
             )}
 
             <Card.Header>
-              <Link href={`${post.user.username}`}>
+              <Link href={`/${post.user.username}`}>
                 <a>{post.user.name}</a>
               </Link>
             </Card.Header>
@@ -132,22 +138,43 @@ function CardPost({ user, post, setPosts, setShowToastr }) {
               name={isLiked ? "heart" : "heart outline"}
               color="red"
               style={{ cursor: "pointer" }}
-              onClick={async () =>
-                await likePost(
-                  post._id,
-                  user._id,
-                  setLikes,
-                  isLiked ? false : true
-                )
-              }
+              onClick={() => {
+                if (socket.current) {
+                  socket.current.emit("likePost", {
+                    postId: post._id,
+                    userId: user._id,
+                    like: isLiked ? false : true,
+                  });
+
+                  socket.current.on("postLiked", () => {
+                    if (isLiked) {
+                      setLikes((prev) =>
+                        prev.filter((like) => like.user !== user._id)
+                      );
+                    }
+                    //
+                    else {
+                      setLikes((prev) => [...prev, { user: user._id }]);
+                    }
+                  });
+                } else {
+                  likePost(
+                    post._id,
+                    user._id,
+                    setLikes,
+                    isLiked ? false : true
+                  );
+                }
+              }}
             />
+
             <LikesList
               postId={post._id}
               trigger={
                 likes.length > 0 && (
-                  <span className="spanLikesList">{`${likes.length} ${
-                    likes.length > 1 ? "likes" : "like"
-                  }`}</span>
+                  <span className="spanLikesList">
+                    {`${likes.length} ${likes.length === 1 ? "like" : "likes"}`}
+                  </span>
                 )
               }
             />
@@ -174,10 +201,10 @@ function CardPost({ user, post, setPosts, setShowToastr }) {
 
             {comments.length > 3 && (
               <Button
+                content="View More"
                 color="teal"
                 basic
                 circular
-                content="View More"
                 onClick={() => setShowModal(true)}
               />
             )}

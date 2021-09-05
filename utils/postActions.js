@@ -21,11 +21,9 @@ export const submitNewPost = async (
 
     setPosts((prev) => [res.data, ...prev]);
     setNewPost({ text: "", location: "" });
-    return true;
-  } catch (err) {
-    const error = catchErrors(err);
-    setError(error);
-    return true;
+  } catch (error) {
+    const errorMsg = catchErrors(error);
+    setError(errorMsg);
   }
 };
 
@@ -34,10 +32,8 @@ export const deletePost = async (postId, setPosts, setShowToastr) => {
     await Axios.delete(`/${postId}`);
     setPosts((prev) => prev.filter((post) => post._id !== postId));
     setShowToastr(true);
-    return true;
-  } catch (err) {
-    console.log(catchErrors(err));
-    return true;
+  } catch (error) {
+    console.error(catchErrors(error));
   }
 };
 
@@ -53,13 +49,14 @@ export const likePost = async (postId, userId, setLikes, like = true) => {
       setLikes((prev) => prev.filter((like) => like.user !== userId));
     }
   } catch (error) {
-    console.log(catchErrors(err));
+    console.error(catchErrors(error));
   }
 };
 
 export const postComment = async (postId, user, text, setComments, setText) => {
   try {
     const res = await Axios.post(`/comment/${postId}`, { text });
+
     const newComment = {
       _id: res.data,
       user,
@@ -69,10 +66,8 @@ export const postComment = async (postId, user, text, setComments, setText) => {
 
     setComments((prev) => [newComment, ...prev]);
     setText("");
-    return true;
-  } catch (err) {
-    console.log(catchErrors(err));
-    return true;
+  } catch (error) {
+    console.error(catchErrors(error));
   }
 };
 
@@ -80,9 +75,7 @@ export const deleteComment = async (postId, commentId, setComments) => {
   try {
     await Axios.delete(`/${postId}/${commentId}`);
     setComments((prev) => prev.filter((comment) => comment._id !== commentId));
-    return true;
-  } catch (err) {
-    console.log(catchErrors(err));
-    return true;
+  } catch (error) {
+    console.error(catchErrors(error));
   }
 };

@@ -1,4 +1,4 @@
-const catchErrors = error => {
+const catchErrors = (error) => {
   let errorMsg;
 
   if (error.response) {

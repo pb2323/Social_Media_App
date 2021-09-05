@@ -12,7 +12,7 @@ function UpdateProfile({ Profile }) {
     facebook: (Profile.social && Profile.social.facebook) || "",
     youtube: (Profile.social && Profile.social.youtube) || "",
     instagram: (Profile.social && Profile.social.instagram) || "",
-    twitter: (Profile.social && Profile.social.twitter) || ""
+    twitter: (Profile.social && Profile.social.twitter) || "",
   });
 
   const [errorMsg, setErrorMsg] = useState(null);
@@ -25,14 +25,14 @@ function UpdateProfile({ Profile }) {
   const [media, setMedia] = useState(null);
   const [mediaPreview, setMediaPreview] = useState(null);
 
-  const handleChange = e => {
+  const handleChange = (e) => {
     const { name, value, files } = e.target;
 
     if (name === "media") {
       setMedia(files[0]);
       setMediaPreview(URL.createObjectURL(files[0]));
     }
-    setProfile(prev => ({ ...prev, [name]: value }));
+    setProfile((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
@@ -40,7 +40,7 @@ function UpdateProfile({ Profile }) {
       <Form
         error={errorMsg !== null}
         loading={loading}
-        onSubmit={async e => {
+        onSubmit={async (e) => {
           e.preventDefault();
           setLoading(true);
 

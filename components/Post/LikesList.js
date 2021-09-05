@@ -15,11 +15,11 @@ function LikesList({ postId, trigger }) {
     setLoading(true);
     try {
       const res = await axios.get(`${baseUrl}/api/posts/like/${postId}`, {
-        headers: { Authorization: cookie.get("token") }
+        headers: { Authorization: cookie.get("token") },
       });
       setLikesList(res.data);
     } catch (error) {
-      alert(catchErrors(error));
+      console.error(catchErrors(error));
     }
     setLoading(false);
   };
@@ -31,7 +31,8 @@ function LikesList({ postId, trigger }) {
       onOpen={getLikesList}
       popperDependencies={[likesList]}
       trigger={trigger}
-      wide>
+      wide
+    >
       {loading ? (
         <LikesPlaceHolder />
       ) : (
@@ -42,10 +43,11 @@ function LikesList({ postId, trigger }) {
                 overflow: "auto",
                 maxHeight: "15rem",
                 height: "15rem",
-                minWidth: "210px"
-              }}>
+                minWidth: "210px",
+              }}
+            >
               <List selection size="large">
-                {likesList.map(like => (
+                {likesList.map((like) => (
                   <List.Item key={like._id}>
                     <Image avatar src={like.user.profilePicUrl} />
 

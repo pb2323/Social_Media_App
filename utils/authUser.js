@@ -3,7 +3,6 @@ import baseUrl from "./baseUrl";
 import catchErrors from "./catchErrors";
 import Router from "next/router";
 import cookie from "js-cookie";
-axios.defaults.baseURL = baseUrl;
 
 export const registerUser = async (
   user,
@@ -12,9 +11,9 @@ export const registerUser = async (
   setLoading
 ) => {
   try {
-    const res = await axios.post("/api/signup", {
-      user: user,
-      profilePicUrl: profilePicUrl,
+    const res = await axios.post(`${baseUrl}/api/signup`, {
+      user,
+      profilePicUrl,
     });
 
     setToken(res.data);
@@ -28,20 +27,14 @@ export const registerUser = async (
 export const loginUser = async (user, setError, setLoading) => {
   setLoading(true);
   try {
-    const res = await axios.post(`${baseUrl}/api/auth`, {
-      user,
-    });
+    const res = await axios.post(`${baseUrl}/api/auth`, { user });
+
     setToken(res.data);
   } catch (error) {
     const errorMsg = catchErrors(error);
     setError(errorMsg);
   }
   setLoading(false);
-};
-
-const setToken = (token) => {
-  cookie.set("token", token);
-  Router.push("/");
 };
 
 export const redirectUser = (ctx, location) => {
@@ -51,6 +44,11 @@ export const redirectUser = (ctx, location) => {
   } else {
     Router.push(location);
   }
+};
+
+const setToken = (token) => {
+  cookie.set("token", token);
+  Router.push("/");
 };
 
 export const logoutUser = (email) => {

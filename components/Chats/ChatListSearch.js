@@ -34,7 +34,7 @@ function ChatListSearch({ chats, setChats }) {
 
       setResults(res.data);
     } catch (error) {
-      alert("Error Searching");
+      console.error("Error Searching");
     }
 
     setLoading(false);

@@ -4,9 +4,11 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { logoutUser } from "../../utils/authUser";
 
-function MobileHeader({ user: { unreadNotification, email, unreadMessage, username } }) {
+function MobileHeader({
+  user: { unreadNotification, email, unreadMessage, username },
+}) {
   const router = useRouter();
-  const isActive = route => router.pathname === route;
+  const isActive = (route) => router.pathname === route;
 
   return (
     <>
@@ -28,7 +30,10 @@ function MobileHeader({ user: { unreadNotification, email, unreadMessage, userna
           </Link>
 
           <Link href="/notifications">
-            <Menu.Item header active={isActive("/notifications") || unreadNotification}>
+            <Menu.Item
+              header
+              active={isActive("/notifications") || unreadNotification}
+            >
               <Icon
                 name={unreadNotification ? "hand point right" : "bell outline"}
                 size="large"

@@ -13,30 +13,29 @@ function SearchComponent() {
 
   const handleChange = async (e) => {
     const { value } = e.target;
-    if (value && value.length > 0) {
-      setText(value);
-      setLoading(true);
-      try {
-        cancel && cancel();
-        const CancelToken = axios.CancelToken;
-        const token = cookie.get("token");
-        const res = await axios.get(`${baseUrl}/api/search/${value}`, {
-          headers: { Authorization: token },
-          cancelToken: new CancelToken((canceller) => {
-            cancel = canceller;
-          }),
-        });
+    setText(value);
+    setLoading(true);
 
-        if (res.data.length === 0) setLoading(false);
-        setResults(res.data);
-      } catch (err) {
-        console.log(err);
-      }
-      setLoading(false);
-    } else {
-      setText(value);
-      setResults([]);
+    try {
+      cancel && cancel();
+      const CancelToken = axios.CancelToken;
+      const token = cookie.get("token");
+
+      const res = await axios.get(`${baseUrl}/api/search/${value}`, {
+        headers: { Authorization: token },
+        cancelToken: new CancelToken((canceler) => {
+          cancel = canceler;
+        }),
+      });
+
+      if (res.data.length === 0) return setLoading(false);
+
+      setResults(res.data);
+    } catch (error) {
+      alconsole.errorert("Error Searching");
     }
+
+    setLoading(false);
   };
 
   return (
@@ -52,9 +51,7 @@ function SearchComponent() {
       results={results}
       onSearchChange={handleChange}
       minCharacters={1}
-      onResultSelect={(e, data) => {
-        Router.push(`/${data.result.username}`);
-      }}
+      onResultSelect={(e, data) => Router.push(`/${data.result.username}`)}
     />
   );
 }
@@ -63,7 +60,7 @@ const ResultRenderer = ({ _id, profilePicUrl, name }) => {
   return (
     <List key={_id}>
       <List.Item>
-        <Image src={profilePicUrl} avatar alt="ProfilePic" />
+        <Image src={profilePicUrl} alt="ProfilePic" avatar />
         <List.Content header={name} as="a" />
       </List.Item>
     </List>

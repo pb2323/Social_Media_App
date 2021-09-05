@@ -11,7 +11,8 @@ export const PostDeleteToastr = () => {
       rtl={false}
       pauseOnFocusLoss
       draggable
-      pauseOnHover={false}>
+      pauseOnHover={false}
+    >
       {toast.info("Deleted Successfully", {
         position: "bottom-center",
         autoClose: 3000,
@@ -19,7 +20,7 @@ export const PostDeleteToastr = () => {
         closeOnClick: true,
         pauseOnHover: false,
         draggable: true,
-        progress: undefined
+        progress: undefined,
       })}
     </ToastContainer>
   );
@@ -36,7 +37,8 @@ export const ErrorToastr = ({ error }) => {
       rtl={false}
       pauseOnFocusLoss
       draggable
-      pauseOnHover={false}>
+      pauseOnHover={false}
+    >
       {toast.error(error, {
         position: "bottom-center",
         autoClose: 3000,
@@ -44,7 +46,7 @@ export const ErrorToastr = ({ error }) => {
         closeOnClick: true,
         pauseOnHover: false,
         draggable: true,
-        progress: undefined
+        progress: undefined,
       })}
     </ToastContainer>
   );
@@ -60,7 +62,8 @@ export const MsgSentToastr = () => (
     rtl={false}
     pauseOnFocusLoss
     draggable
-    pauseOnHover={false}>
+    pauseOnHover={false}
+  >
     {toast.success("Sent successfully", {
       position: "bottom-center",
       autoClose: 3000,
@@ -68,7 +71,7 @@ export const MsgSentToastr = () => (
       closeOnClick: true,
       pauseOnHover: false,
       draggable: true,
-      progress: undefined
+      progress: undefined,
     })}
   </ToastContainer>
 );

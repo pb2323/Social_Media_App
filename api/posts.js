@@ -7,8 +7,8 @@ const FollowerModel = require("../models/FollowerModel");
 const uuid = require("uuid").v4;
 const {
   newLikeNotification,
-  newCommentNotification,
   removeLikeNotification,
+  newCommentNotification,
   removeCommentNotification,
 } = require("../utilsServer/notificationActions");
 
@@ -93,7 +93,6 @@ router.get("/", authMiddleware, async (req, res) => {
         if (foundPostsFromFollowing.length > 0)
           postsToBeSent.push(...foundPostsFromFollowing);
       }
-
       const foundOwnPosts = posts.filter(
         (post) => post.user._id.toString() === userId
       );
@@ -258,6 +257,7 @@ router.post("/comment/:postId", authMiddleware, async (req, res) => {
   try {
     const { postId } = req.params;
 
+    const { userId } = req;
     const { text } = req.body;
 
     if (text.length < 1)
@@ -270,18 +270,18 @@ router.post("/comment/:postId", authMiddleware, async (req, res) => {
     const newComment = {
       _id: uuid(),
       text,
-      user: req.userId,
+      user: userId,
       date: Date.now(),
     };
 
     await post.comments.unshift(newComment);
     await post.save();
 
-    if (post.user.toString() !== req.userId) {
+    if (post.user.toString() !== userId) {
       await newCommentNotification(
         postId,
         newComment._id,
-        req.userId,
+        userId,
         post.user.toString(),
         text
       );
@@ -320,6 +320,15 @@ router.delete("/:postId/:commentId", authMiddleware, async (req, res) => {
 
       await post.save();
 
+      if (post.user.toString() !== userId) {
+        await removeCommentNotification(
+          postId,
+          commentId,
+          userId,
+          post.user.toString()
+        );
+      }
+
       return res.status(200).send("Deleted Successfully");
     };
 
@@ -329,15 +338,6 @@ router.delete("/:postId/:commentId", authMiddleware, async (req, res) => {
       } else {
         return res.status(401).send("Unauthorized");
       }
-    }
-
-    if (post.user.toString() !== userId) {
-      await removeCommentNotification(
-        postId,
-        commentId,
-        userId,
-        post.user.toString()
-      );
     }
 
     await deleteComment();

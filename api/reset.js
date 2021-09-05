@@ -9,8 +9,8 @@ const baseUrl = require("../utils/baseUrl");
 const isEmail = require("validator/lib/isEmail");
 const options = {
   auth: {
-    api_key: process.env.sendGrid_api
-  }
+    api_key: process.env.sendGrid_api,
+  },
 };
 
 const transporter = nodemailer.createTransport(sendGridTransport(options));
@@ -46,7 +46,7 @@ router.post("/", async (req, res) => {
       html: `<p>Hey ${user.name
         .split(" ")[0]
         .toString()}, There was a request for password reset. <a href=${href}>Click this link to reset the password </a>   </p>
-      <p>This token is valid for only 1 hour.</p>`
+      <p>This token is valid for only 1 hour.</p>`,
     };
 
     transporter.sendMail(mailOptions, (err, info) => err && console.log(err));
