@@ -34,7 +34,7 @@ io.on("connection", (socket) => {
       socket.emit("connectedUsers", {
         users: users.filter((user) => user.userId !== userId),
       });
-    }, 10000);
+    }, 5000);
   });
 
   socket.on("likePost", async ({ postId, userId, like }) => {

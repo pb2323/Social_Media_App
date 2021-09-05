@@ -18,11 +18,13 @@ router.get("/:searchText", authMiddleware, async (req, res) => {
 
     const resultsToBeSent =
       results.length > 0 &&
-      results.filter((result) => result._id.toString() !== userId);
+      results.filter((result) => {
+        return result._id.toString() !== userId.toString();
+      });
 
     return res
       .status(200)
-      .json(resultsToBeSent.length > 0 ? resultsToBeSent : results);
+      .json(resultsToBeSent.length > 0 ? resultsToBeSent : []);
   } catch (error) {
     console.error(error);
     return res.status(500).send(`Server error`);

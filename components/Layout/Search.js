@@ -14,6 +14,10 @@ function SearchComponent() {
   const handleChange = async (e) => {
     const { value } = e.target;
     setText(value);
+    if (!value || value === "") {
+      setResults([]);
+      return;
+    }
     setLoading(true);
 
     try {
@@ -32,7 +36,7 @@ function SearchComponent() {
 
       setResults(res.data);
     } catch (error) {
-      alconsole.errorert("Error Searching");
+      console.error("Error Searching");
     }
 
     setLoading(false);

@@ -15,7 +15,10 @@ function ChatListSearch({ chats, setChats }) {
   const handleChange = async (e) => {
     const { value } = e.target;
     setText(value);
-    if (!value || value === "") return;
+    if (!value || value === "") {
+      setResults([]);
+      return;
+    }
     setLoading(true);
 
     try {
@@ -41,11 +44,20 @@ function ChatListSearch({ chats, setChats }) {
   };
 
   const addChat = (result) => {
-    const alreadyInChat =
-      chats.length > 0 &&
-      chats.filter((chat) => chat.messsagesWith === result._id).length > 0;
-
-    if (alreadyInChat) {
+    const alreadyInChat = chats.reduce((acc, ele) => {
+      if (ele?.messagesWith?.toString() === result._id?.toString()) acc = true;
+      return acc;
+    }, false);
+    // const alreadyInChat =
+    //   chats.length > 0 &&
+    //   chats.filter(
+    //     (chat) => chat?.messsagesWith?.toString() === result?._id?.toString()
+    //   ).length > 0;
+    console.log(chats, router.query.message, result._id, alreadyInChat);
+    if (alreadyInChat && router.query.message === result._id) {
+      console.log("jer");
+      return;
+    } else if (alreadyInChat) {
       return router.push(`/messages?message=${result._id}`);
     }
     //
