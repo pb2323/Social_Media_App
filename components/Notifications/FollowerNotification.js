@@ -28,30 +28,33 @@ function FollowerNotification({
               </Feed.User>{" "}
               started following you.
               <Feed.Date>{calculateTime(notification.date)}</Feed.Date>
+              <Button
+                style={{ float: "right" }}
+                size="small"
+                compact
+                icon={isFollowing ? "check circle" : "add user"}
+                color={isFollowing ? "instagram" : "twitter"}
+                disabled={disabled}
+                onClick={async () => {
+                  setDisabled(true);
+
+                  isFollowing
+                    ? await unfollowUser(
+                        notification.user._id,
+                        setUserFollowStats
+                      )
+                    : await followUser(
+                        notification.user._id,
+                        setUserFollowStats
+                      );
+
+                  setDisabled(false);
+                }}
+              />
             </>
           </Feed.Summary>
 
-          <div style={{ position: "absolute", right: "5px" }}>
-            <Button
-              size="small"
-              compact
-              icon={isFollowing ? "check circle" : "add user"}
-              color={isFollowing ? "instagram" : "twitter"}
-              disabled={disabled}
-              onClick={async () => {
-                setDisabled(true);
-
-                isFollowing
-                  ? await unfollowUser(
-                      notification.user._id,
-                      setUserFollowStats
-                    )
-                  : await followUser(notification.user._id, setUserFollowStats);
-
-                setDisabled(false);
-              }}
-            />
-          </div>
+          <div style={{ position: "absolute", right: "5px" }}></div>
         </Feed.Content>
       </Feed.Event>
       <Divider />

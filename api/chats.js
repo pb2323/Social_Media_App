@@ -48,6 +48,25 @@ router.get("/user/:userToFindId", authMiddleware, async (req, res) => {
   }
 });
 
+//To switch off new message notification
+
+router.post("/", authMiddleware, async (req, res) => {
+  try {
+    const { userId } = req;
+
+    const user = await UserModel.findById(userId);
+
+    if (user.unreadMessage) {
+      user.unreadMessage = false;
+      await user.save();
+    }
+    return res.status(200).send("Updated");
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send("Server Error");
+  }
+});
+
 // Delete a chat
 
 router.delete(`/:messagesWith`, authMiddleware, async (req, res) => {
