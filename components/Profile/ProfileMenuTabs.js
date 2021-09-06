@@ -1,5 +1,6 @@
 import React from "react";
 import { Menu } from "semantic-ui-react";
+import styles from "./ProfileMenuTabs.module.css";
 
 function ProfileMenuTabs({
   activeItem,
@@ -11,7 +12,7 @@ function ProfileMenuTabs({
 }) {
   return (
     <>
-      <Menu pointing secondary>
+      <Menu pointing secondary className={styles.row}>
         <Menu.Item
           name="profile"
           active={activeItem === "profile"}

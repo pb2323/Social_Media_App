@@ -1,0 +1,6 @@
+.row::-webkit-scrollbar {
+  height: 0px;
+}
+.row {
+  overflow-x: auto;
+}
