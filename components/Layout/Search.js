@@ -32,7 +32,10 @@ function SearchComponent() {
         }),
       });
 
-      if (res.data.length === 0) return setLoading(false);
+      if (res.data.length === 0) {
+        setResults([]);
+        return setLoading(false);
+      }
 
       setResults(res.data);
     } catch (error) {

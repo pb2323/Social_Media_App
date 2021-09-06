@@ -38,12 +38,12 @@ function PostPage({ post, errorLoading, user }) {
           {post.picUrl && (
             <Image
               src={post.picUrl}
-              style={{ cursor: "pointer" }}
+              // style={{ cursor: "pointer" }}
               floated="left"
               wrapped
               ui={false}
               alt="PostImage"
-              onClick={() => setShowModal(true)}
+              // onClick={() => setShowModal(true)}
             />
           )}
 
