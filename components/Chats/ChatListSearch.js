@@ -56,9 +56,7 @@ function ChatListSearch({ chats, setChats }) {
     //   chats.filter(
     //     (chat) => chat?.messsagesWith?.toString() === result?._id?.toString()
     //   ).length > 0;
-    console.log(chats, router.query.message, result._id, alreadyInChat);
     if (alreadyInChat && router.query.message === result._id) {
-      console.log("jer");
       return;
     } else if (alreadyInChat) {
       return router.push(`/messages?message=${result._id}`);

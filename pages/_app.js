@@ -4,6 +4,7 @@ import { parseCookies, destroyCookie } from "nookies";
 import baseUrl from "../utils/baseUrl";
 import { redirectUser } from "../utils/authUser";
 import Layout from "../components/Layout/Layout";
+// import { ContextProvider } from '../utils/Context'
 import "react-toastify/dist/ReactToastify.css";
 import "semantic-ui-css/semantic.min.css";
 
@@ -53,9 +54,11 @@ class MyApp extends App {
     const { Component, pageProps } = this.props;
 
     return (
-      <Layout {...pageProps}>
-        <Component {...pageProps} />
-      </Layout>
+      // <ContextProvider>
+        <Layout {...pageProps}>
+          <Component {...pageProps} />
+        </Layout>
+      // </ContextProvider>
     );
   }
 }

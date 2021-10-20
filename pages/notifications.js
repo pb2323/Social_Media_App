@@ -21,7 +21,7 @@ function Notifications({ notifications, errorLoading, user, userFollowStats }) {
           { headers: { Authorization: cookie.get("token") } }
         );
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     };
 

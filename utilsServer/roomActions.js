@@ -8,22 +8,21 @@ const addUser = async (userId, socketId) => {
   }
   //
   else {
-    if (user && user.socketId !== socketId) {
-      await removeUser(user.socketId);
-    }
-
     const newUser = { userId, socketId };
 
     users.push(newUser);
+    if (user && user.socketId !== socketId) {
+      removeUser(user.socketId);
+    }
 
     return users;
   }
 };
 
-const removeUser = async (socketId) => {
+const removeUser = (socketId) => {
   const indexOf = users.map((user) => user.socketId).indexOf(socketId);
 
-  await users.splice(indexOf, 1);
+  users.splice(indexOf, 1);
 
   return;
 };
@@ -31,4 +30,8 @@ const removeUser = async (socketId) => {
 const findConnectedUser = (userId) =>
   users.find((user) => user.userId === userId);
 
-module.exports = { addUser, removeUser, findConnectedUser };
+const getUsers = async () => {
+  return users
+}
+
+module.exports = { addUser, removeUser, findConnectedUser, getUsers };

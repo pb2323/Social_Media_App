@@ -17,7 +17,7 @@ const loadMessages = async (userId, messagesWith) => {
 
     return { chat };
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { error };
   }
 };
@@ -119,7 +119,7 @@ const deleteMsg = async (userId, messagesWith, messageId) => {
 
     return { success: true };
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
 

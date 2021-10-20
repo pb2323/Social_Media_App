@@ -28,7 +28,7 @@ export const loginUser = async (user, setError, setLoading) => {
   setLoading(true);
   try {
     const res = await axios.post(`${baseUrl}/api/auth`, { user });
-
+    console.log(res,'dta');
     setToken(res.data);
   } catch (error) {
     const errorMsg = catchErrors(error);

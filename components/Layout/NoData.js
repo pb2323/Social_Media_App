@@ -1,4 +1,6 @@
 import { Message, Button } from "semantic-ui-react";
+import Link from "next/link";
+
 
 export const NoProfilePosts = () => (
   <>
@@ -10,10 +12,9 @@ export const NoProfilePosts = () => (
     />
     <Button
       icon="long arrow alternate left"
-      content="Go Back"
-      as="a"
-      href="/"
-    />
+    >
+      <Link href='/'>Go Back</Link>
+    </Button>
   </>
 );
 

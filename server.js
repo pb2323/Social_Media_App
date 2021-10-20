@@ -1,7 +1,12 @@
 const express = require("express");
 const app = express();
 const server = require("http").Server(app);
-const io = require("socket.io")(server);
+const io = require("socket.io")(server, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
+  }
+});
 const cors = require("cors")
 const next = require("next");
 const dev = process.env.NODE_ENV !== "production";
@@ -17,6 +22,7 @@ const {
   addUser,
   removeUser,
   findConnectedUser,
+  getUsers
 } = require("./utilsServer/roomActions");
 const {
   loadMessages,
@@ -30,14 +36,18 @@ const { likeOrUnlikePost } = require("./utilsServer/likeOrUnlikePost");
 io.on("connection", (socket) => {
   socket.on("join", async ({ userId }) => {
     const users = await addUser(userId, socket.id);
-    console.log(users);
-
-    setInterval(() => {
-      socket.emit("connectedUsers", {
-        users: users.filter((user) => user.userId !== userId),
-      });
-    }, 5000);
+    console.log(users, 'here');
+    socket.emit("socketid", socket.id)
   });
+
+  setInterval(async () => {
+    const users = await getUsers()
+    socket.emit("connectedUsers", {
+      users
+    });
+  }, 5000);
+
+  socket.emit("me", socket.id)
 
   socket.on("likePost", async ({ postId, userId, like }) => {
     const { success, name, profilePicUrl, username, postByUserId, error } =
@@ -64,7 +74,6 @@ io.on("connection", (socket) => {
 
   socket.on("loadMessages", async ({ userId, messagesWith }) => {
     const { chat, error } = await loadMessages(userId, messagesWith);
-
     !error
       ? socket.emit("messagesLoaded", { chat })
       : socket.emit("noChatFound");
@@ -111,7 +120,21 @@ io.on("connection", (socket) => {
     }
   );
 
-  socket.on("disconnect", () => removeUser(socket.id));
+  socket.on("calluser", ({ userToCall, signalData, from, name }) => {
+    console.log('calluser', userToCall, from)
+    io.to(userToCall).emit("calluser", { signal: signalData, from, name })
+    // io.to(userToCall).emit("cc",'hi')
+  })
+
+  socket.on("answercall", (data) => {
+    console.log('answered',data)
+    io.to(data.to).emit("callaccepted", data.signal)
+  })
+
+  socket.on("disconnect", () => {
+    removeUser(socket.id);
+
+  });
 });
 
 nextApp.prepare().then(() => {

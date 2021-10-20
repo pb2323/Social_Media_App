@@ -1,0 +1,30 @@
+.main {
+    position: relative;
+    width: 100%;
+    height: 28vh;
+    display: flex;
+    flex-direction: column;
+    background-color: black;
+}
+
+.videos {
+    /* background-color: blue; */
+    flex: 0.8;
+    margin: auto;
+    text-align: center;
+}
+
+.user {
+    width: 40%;
+    height: 90%;
+    position: absolute;
+    margin: 10px;
+}
+
+.controls {
+    flex: 0.2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: black;
+}
