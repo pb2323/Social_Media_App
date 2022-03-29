@@ -115,3 +115,9 @@
 .unmute, .stop {
     color: #CC3B33;
 }
+
+.display_image {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}

@@ -15,7 +15,7 @@ import getUserInfo from "../utils/getUserInfo";
 import newMsgSound from "../utils/newMsgSound";
 import cookie from "js-cookie";
 import Peer from 'simple-peer'
-// import { SocketContext } from '../utils/Context'
+import { SocketContext } from '../utils/Context'
 import CallReceiver from '../components/Messages/CallReceiver'
 
 const scrollDivToBottom = (divRef) =>
@@ -23,9 +23,10 @@ const scrollDivToBottom = (divRef) =>
   divRef.current.scrollIntoView({ behaviour: "smooth" });
 
 function Messages({ chatsData, user }) {
-  // const { answerCall, call, callAccepted, setMe, setCall, callEnded, connectionRef, setCallAccepted, peercon } = useContext(SocketContext)
+  const { call, callAccepted, setMe, setCall, callEnded, myVideo, setStream, connectionRef, setCallAccepted, leaveCall, userCalled, setToDefault, setUserCalled, setCallEnded } = useContext(SocketContext)
   const [chats, setChats] = useState(chatsData);
   const router = useRouter();
+  const [open, setOpen] = useState(false)
 
   const socket = useRef();
   const [connectedUsers, setConnectedUsers] = useState([]);
@@ -34,78 +35,6 @@ function Messages({ chatsData, user }) {
   const [bannerData, setBannerData] = useState({ name: "", profilePicUrl: "", userId: '' });
 
   const divRef = useRef();
-  const [stream, setStream] = useState(null)
-  const [me, setMe] = useState('')
-  const [call, setCall] = useState({})
-  const [callAccepted, setCallAccepted] = useState(false)
-  const [callEnded, setCallEnded] = useState(false)
-  const [name, setName] = useState('')
-  const myVideo = useRef()
-  const userVideo = useRef()
-  const connectionRef = useRef()
-  const answerCall = () => {
-    const acceptor = new Peer({ initiator: false, trickle: false, stream })
-    acceptor.on('signal', (data) => {
-      socket.current.emit("answercall", { signal: data, to: call.from })
-    })
-
-    acceptor.on('stream', (currentStream) => {
-      console.log(currentStream)
-      userVideo.current.srcObject = currentStream
-    })
-
-    acceptor.on("close", (da) => {
-      console.log(da, 'closed')
-    })
-    acceptor.on("error", (err) => {
-      console.log(err)
-    })
-    console.log(call.signal)
-    acceptor.signal(call.signal)
-    console.log(acceptor)
-    connectionRef.current = acceptor
-    setCallAccepted(true)
-  }
-
-  const callUser = (id) => {
-    const initiator = new Peer({ initiator: true, trickle: false, stream })
-    initiator.on('signal', (data) => {
-      socket.current.emit("calluser", { userToCall: id, signalData: data, from: me, name })
-    })
-
-    initiator.on('stream', (currentStream) => {
-      console.log('inside stream')
-      userVideo.current.srcObject = currentStream
-    })
-    initiator.on("close", (da) => {
-      console.log(da, 'closed')
-    })
-    initiator.on("error", (err) => {
-      console.log(err)
-    })
-    socket.current.on('callaccepted', (signal) => {
-      console.log('callaccept')
-      initiator.signal(signal)
-      console.log(connectionRef.current)
-      setCallAccepted(true)
-      // setTimeout(() => {
-      //     setCallAccepted(true)
-      // }, 1000)
-    })
-    // setTimeout(() => {
-    //     console.log(socket)
-    // }, 5000)
-    connectionRef.current = initiator
-
-    // console.log(peer)
-    // setPeercon(peer)
-  }
-
-  const leaveCall = () => {
-    setCallEnded(true)
-    console.log(connectionRef.current)
-    // connectionRef.current.destroy()
-  }
 
   // This ref is for persisting the state of query string in url throughout re-renders. This ref is the value of query string inside url
   const openChatId = useRef("");
@@ -128,14 +57,17 @@ function Messages({ chatsData, user }) {
   }, []);
 
   useEffect(() => {
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-      .then((currentStream) => {
-        setStream(currentStream)
-        myVideo.current.srcObject = currentStream
-      })
+    setOpen(false)
+    setToDefault();
+  }, [callEnded])
 
+  // useEffect(() => {
 
-  }, [])
+  //     .then((currentStream) => {
+  //       setStream(currentStream)
+  //       myVideo.current.srcObject = currentStream
+  //     })
+  // }, [callEnded])
 
   //CONNECTION useEffect
   useEffect(() => {
@@ -151,12 +83,24 @@ function Messages({ chatsData, user }) {
       socket.current.on("connectedUsers", ({ users }) => {
         users.length > 0 && setConnectedUsers(users);
       });
-      socket.current.on("calluser", ({ from, name, signal }) => {
-        console.log('Inside callUser', from, name)
-        setCall({ name, from, signal, isReceivingCall: true })
+      socket.current.on("calluser", ({ from, signal, isVideoCall }) => {
+        console.log('Inside callUser', from)
+        setUserCalled(from)
+        setCall({ from, signal, isReceivingCall: true, isVideoCall })
       })
-      socket.current.on("cc", (text) => {
-        console.log(text)
+      // socket.current.on("cc", (text) => {
+      //   console.log(text)
+      // })
+      socket.current.on('callaccepted', (signal) => {
+        console.log('callaccept')
+        connectionRef.current.signal(signal)
+        console.log(connectionRef.current)
+        setCallAccepted(true)
+      })
+
+      socket.current.on("leaveCall", () => {
+        setOpen(false)
+        leaveCall(userCalled)
       })
 
       if (chats.length > 0 && !router.query.message) {
@@ -346,7 +290,7 @@ function Messages({ chatsData, user }) {
   }, {})
   return (
     <>
-      <video ref={myVideo} height={0} width={0}></video>
+      {/* <video ref={myVideo} height={0} width={0}></video> */}
       <Segment padded basic size="large" style={{ marginTop: "5px" }}>
         <Header
           icon="home"
@@ -394,7 +338,7 @@ function Messages({ chatsData, user }) {
                       }}
                     >
                       <div style={{ position: "sticky", top: "0" }}>
-                        <Banner callEnded={callEnded} leaveCall={leaveCall} myVideo={myVideo} userVideo={userVideo} call={call} setStream={setStream} callUser={callUser} callAccepted={callAccepted} userProfilePicUrl={user.profilePicUrl} connectedUsers={connectedUsers} bannerData={bannerData} />
+                        <Banner open={open} setOpen={setOpen} userProfilePicUrl={user.profilePicUrl} connectedUsers={connectedUsers} bannerData={bannerData} />
                       </div>
 
                       {messages.length > 0 &&
@@ -415,7 +359,7 @@ function Messages({ chatsData, user }) {
                 )}
               </Grid.Column>
               <Grid.Column width={4}>
-                {call.isReceivingCall && !callAccepted && !callEnded && <CallReceiver answerCall={answerCall} leaveCall={leaveCall} chat={chatToPass} />}
+                {call.isReceivingCall && !callAccepted && !callEnded && <CallReceiver chat={chatToPass} />}
               </Grid.Column>
             </Grid>
           </>

@@ -18,11 +18,11 @@ import getUserInfo from "../utils/getUserInfo";
 import MessageNotificationModal from "../components/Home/MessageNotificationModal";
 import newMsgSound from "../utils/newMsgSound";
 import NotificationPortal from "../components/Home/NotificationPortal";
-// import { SocketContext } from '../utils/Context'
+import { SocketContext } from '../utils/Context'
 
 
 function Index({ user, postsData, errorLoading }) {
-  // const { setMe } = useContext(SocketContext)
+  const { setMe } = useContext(SocketContext)
   const [posts, setPosts] = useState(postsData || []);
   const [showToastr, setShowToastr] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -44,9 +44,9 @@ function Index({ user, postsData, errorLoading }) {
 
     if (socket.current) {
       socket.current.emit("join", { userId: user._id });
-      // socket.current.on("socketid", (id) => {
-      //   setMe(id)
-      // })
+      socket.current.on("socketid", (id) => {
+        setMe(id)
+      })
       socket.current.on("newMsgReceived", async ({ newMsg }) => {
         const { name, profilePicUrl } = await getUserInfo(newMsg.sender);
 

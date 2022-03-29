@@ -120,15 +120,20 @@ io.on("connection", (socket) => {
     }
   );
 
-  socket.on("calluser", ({ userToCall, signalData, from, name }) => {
-    console.log('calluser', userToCall, from)
-    io.to(userToCall).emit("calluser", { signal: signalData, from, name })
+  socket.on("calluser", ({ userToCall, signalData, from, isVideoCall }) => {
+    console.log('calluser', userToCall, from, 'to-from')
+    io.to(userToCall).emit("calluser", { signal: signalData, from, isVideoCall })
     // io.to(userToCall).emit("cc",'hi')
   })
 
   socket.on("answercall", (data) => {
-    console.log('answered',data)
+    console.log('answered', data)
     io.to(data.to).emit("callaccepted", data.signal)
+  })
+
+  socket.on("leaveCall", (data) => {
+    console.log(data.from, data.to, 'leaving - from, to')
+    io.to(data.to).emit("leaveCall")
   })
 
   socket.on("disconnect", () => {

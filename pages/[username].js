@@ -16,7 +16,7 @@ import Following from "../components/Profile/Following";
 import UpdateProfile from "../components/Profile/UpdateProfile";
 import Settings from "../components/Profile/Settings";
 import { PostDeleteToastr } from "../components/Layout/Toastr";
-// import { SocketContext } from '../utils/Context'
+import { SocketContext } from '../utils/Context'
 
 function ProfilePage({
   errorLoading,
@@ -27,7 +27,7 @@ function ProfilePage({
   userFollowStats,
 }) {
   const router = useRouter();
-  // const { setMe } = useContext(SocketContext)
+  const { setMe } = useContext(SocketContext)
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showToastr, setShowToastr] = useState(false);
@@ -77,9 +77,9 @@ function ProfilePage({
 
     if (socket.current) {
       socket.current.emit("join", { userId: user._id });
-      // socket.current.on("socketid", (id) => {
-      //   setMe(id)
-      // })
+      socket.current.on("socketid", (id) => {
+        setMe(id)
+      })
     }
 
     // return () => {

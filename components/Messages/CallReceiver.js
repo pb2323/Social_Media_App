@@ -1,9 +1,9 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import styled from "styled-components";
 import styles from './CallReceiver.module.css'
 import CallAcceptIcon from '../../statics/icons/CallAcception'
 import CallRejectIcon from '../../statics/icons/CallRejection'
-// import { SocketContext } from '../../utils/Context'
+import { SocketContext } from '../../utils/Context'
 
 const ButtonPanel = styled.div`
   background: linear-gradient(95.16deg, #ff00c7 -24.95%, #3d98e7 124.85%);
@@ -63,27 +63,31 @@ const CallRejectButton = styled.button`
 `;
 
 
-const CallReceiver = ({ chat,answerCall, leaveCall }) => {
-    // const { answerCall, leaveCall } = useContext(SocketContext)
-    return (
-        <div className={styles.main}>
-            <div className={styles.videos}>
-                <p style={{ color: 'white', position: 'relative', top: '5px' }}>{chat.name} is calling</p>
-                <img height='150px' width='70%' src={chat.profilePicUrl} style={{
-                    objectFit: 'contain',
-                    // borderRadius: '50%'
-                }} />
-            </div>
-            <div className={styles.controls}>
-                <CallAcceptButton onClick={answerCall}>
-                    <CallAcceptIcon />
-                </CallAcceptButton>
-                <CallRejectButton onClick={leaveCall}>
-                    <CallRejectIcon />
-                </CallRejectButton>
-            </div>
-        </div>
-    )
+const CallReceiver = ({ chat }) => {
+  const { answerCall, rejectCall, setStream, call } = useContext(SocketContext)
+  return (
+    <div className={styles.main}>
+      <div className={styles.videos}>
+        <p style={{ color: 'white', position: 'relative', top: '5px' }}>{chat.name} is {call.isVideoCall ? 'video ' : ""}calling</p>
+        <img height='150px' width='70%' src={chat.profilePicUrl} style={{
+          objectFit: 'contain',
+          // borderRadius: '50%'
+        }} />
+      </div>
+      <div className={styles.controls}>
+        <CallAcceptButton onClick={async () => {
+          const currentStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: call.isVideoCall })
+          setStream(currentStream)
+          answerCall(currentStream)
+        }}>
+          <CallAcceptIcon />
+        </CallAcceptButton>
+        <CallRejectButton onClick={rejectCall}>
+          <CallRejectIcon />
+        </CallRejectButton>
+      </div>
+    </div>
+  )
 }
 
 export default CallReceiver

@@ -10,16 +10,17 @@ const ContextProvider = ({ children }) => {
 
     const [stream, setStream] = useState(null)
     const [me, setMe] = useState('')
+    const [userCalled, setUserCalled] = useState("")
     const [call, setCall] = useState({})
     const [callAccepted, setCallAccepted] = useState(false)
     const [callEnded, setCallEnded] = useState(false)
-    const [name, setName] = useState('')
     const myVideo = useRef()
     const userVideo = useRef()
     const connectionRef = useRef()
 
-    const answerCall = () => {
-        const acceptor = new Peer({ initiator: false, trickle: false, stream })
+    const answerCall = (currentStream) => {
+        const acceptor = new Peer({ initiator: false, trickle: false, stream: currentStream })
+        setStream(currentStream)
         acceptor.on('signal', (data) => {
             socket.emit("answercall", { signal: JSON.stringify(data), to: call.from })
         })
@@ -30,22 +31,20 @@ const ContextProvider = ({ children }) => {
         })
 
         acceptor.on("close", (da) => {
-            console.log(da,'closed')
+            console.log(da, 'closed')
         })
         acceptor.on("error", (err) => {
             console.log(err)
         })
-        console.log(call.signal)
         acceptor.signal(call.signal)
-        console.log(acceptor)
         connectionRef.current = acceptor
         setCallAccepted(true)
     }
 
-    const callUser = (id) => {
-        const initiator = new Peer({ initiator: true, trickle: false, stream })
+    const callUser = (id, currentStream, isVideoCall) => {
+        const initiator = new Peer({ initiator: true, trickle: false, stream:currentStream })
         initiator.on('signal', (data) => {
-            socket.emit("calluser", { userToCall: id, signalData: JSON.stringify(data), from: me, name })
+            socket.emit("calluser", { userToCall: id, signalData: JSON.stringify(data), from: me, isVideoCall })
         })
 
         initiator.on('stream', (currentStream) => {
@@ -53,7 +52,7 @@ const ContextProvider = ({ children }) => {
             userVideo.current.srcObject = currentStream
         })
         initiator.on("close", (da) => {
-            console.log(da,'closed')
+            console.log(da, 'closed')
         })
         initiator.on("error", (err) => {
             console.log(err)
@@ -67,11 +66,30 @@ const ContextProvider = ({ children }) => {
         // setPeercon(peer)
     }
 
-    const leaveCall = () => {
+    const leaveCall = (id) => {
         setCallEnded(true)
-        console.log(connectionRef.current)
-        // connectionRef.current.destroy()
+        socket.emit("leaveCall", { to: id, from: me });
+        connectionRef?.current?.destroy()
     }
+
+    const rejectCall = () => {
+        socket.emit("leaveCall", { to: userCalled, from: me });
+        setToDefault();
+    }
+
+    const setToDefault = () => {
+        setCallAccepted(false)
+        setCallEnded(false)
+        stream?.getVideoTracks()?.forEach((track) => track.stop())
+        stream?.getAudioTracks()?.forEach((track) => track.stop())
+        setStream(null)
+        setUserCalled("")
+        setCall({})
+        // myVideo = useRef()
+        // userVideo = useRef()
+        // connectionRef = useRef()
+    }
+
     return (
         <SocketContext.Provider value={{
             answerCall,
@@ -82,8 +100,6 @@ const ContextProvider = ({ children }) => {
             myVideo,
             userVideo,
             stream,
-            name,
-            setName,
             callEnded,
             me,
             setStream,
@@ -91,6 +107,11 @@ const ContextProvider = ({ children }) => {
             setCall,
             connectionRef,
             setCallAccepted,
+            setCallEnded,
+            userCalled,
+            setUserCalled,
+            setToDefault,
+            rejectCall
         }}>
             {children}
         </SocketContext.Provider>
