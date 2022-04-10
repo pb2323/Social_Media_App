@@ -19,7 +19,13 @@ class MyApp extends App {
       ctx.pathname === "/notifications" ||
       ctx.pathname === "/post/[postId]" ||
       ctx.pathname === "/messages" ||
-      ctx.pathname === "/search";
+      ctx.pathname === "/search" ||
+      ctx.pathname === "/contracts" ||
+      ctx.pathname === "/contracts/new" ||
+      ctx.pathname === "/contracts/[address]" ||
+      ctx.pathname === "/contracts/[address]/requests" ||
+      ctx.pathname === "/contracts/[address]/requests/new";
+    
     if (!token) {
       destroyCookie(ctx, "token");
       protectedRoutes && redirectUser(ctx, "/login");

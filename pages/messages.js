@@ -4,7 +4,7 @@ import axios from "axios";
 import baseUrl from "../utils/baseUrl";
 import { parseCookies } from "nookies";
 import { useRouter } from "next/router";
-import { Segment, Header, Divider, Comment, Grid } from "semantic-ui-react";
+import { Segment, Header, Divider, Comment, Grid, Button } from "semantic-ui-react";
 import Chat from "../components/Chats/Chat";
 import ChatListSearch from "../components/Chats/ChatListSearch";
 import { NoMessages } from "../components/Layout/NoData";
@@ -292,12 +292,14 @@ function Messages({ chatsData, user }) {
     <>
       {/* <video ref={myVideo} height={0} width={0}></video> */}
       <Segment padded basic size="large" style={{ marginTop: "5px" }}>
-        <Header
+        <Button
           icon="home"
           content="Go Back!"
           onClick={() => router.push("/")}
           style={{ cursor: "pointer" }}
+          secondary
         />
+        <Button icon="legal" primary style={{float:'right'}} content="Smart Contracts"/>
         <Divider hidden />
 
         <div style={{ marginBottom: "10px" }}>

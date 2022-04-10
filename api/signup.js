@@ -43,6 +43,7 @@ router.post("/", async (req, res) => {
     youtube,
     twitter,
     instagram,
+    wallet
   } = req.body.user;
 
   if (!isEmail(email)) return res.status(401).send("Invalid Email");
@@ -71,7 +72,7 @@ router.post("/", async (req, res) => {
 
     let profileFields = {};
     profileFields.user = user._id;
-
+    // profileFields.wallet = wallet;
     profileFields.bio = bio;
 
     profileFields.social = {};

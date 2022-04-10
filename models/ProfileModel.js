@@ -13,6 +13,8 @@ const ProfileSchema = new Schema(
       instagram: { type: String },
       facebook: { type: String },
     },
+
+    wallet: {type: String, required:true}
   },
   { timestamps: true }
 );

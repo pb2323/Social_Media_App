@@ -18,6 +18,7 @@ function Signup() {
     name: "",
     email: "",
     password: "",
+    wallet:"",
     bio: "",
     facebook: "",
     youtube: "",
@@ -25,7 +26,7 @@ function Signup() {
     instagram: "",
   });
 
-  const { name, email, password, bio } = user;
+  const { name, email, password, bio, wallet } = user;
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -192,6 +193,18 @@ function Signup() {
             }}
             fluid
             icon={usernameAvailable ? "check" : "close"}
+            iconPosition="left"
+          />
+
+          <Form.Input
+            required
+            label="Metamask Wallet"
+            placeholder="For eg: 0x7CC00206d1cFd032f834B3320F47FF64e7A470bF"
+            name="wallet"
+            value={wallet}
+            onChange={handleChange}
+            fluid
+            icon="ethereum"
             iconPosition="left"
           />
 
