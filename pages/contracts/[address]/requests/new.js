@@ -1,92 +1,106 @@
 import Link from "next/link";
-import React, { Component } from "react";
+import React, { Component, useState } from "react";
 import { Button, Form, Input, Message } from "semantic-ui-react";
 // import Layout from "../../../../components/Layout";
 import Contract from "../../../../ethereum/contract";
 import web3 from "../../../../ethereum/web3";
 // import { Router } from "../../../../routes";
 import { useRouter } from "next/router";
-const Router = useRouter();
 
-export default class newRequest extends Component {
-    state = {
-        value: "",
-        description: "",
-        recipient: "",
-        loading: false,
-        errorMessage: "",
-    };
+export default function NewRequest() {
+    // state = {
+    //     value: "",
+    //     description: "",
+    //     recipient: "",
+    //     loading: false,
+    //     errorMessage: "",
+    // };
 
-    static async getInitialProps(props) {
-        const { address } = props.query;
-        return { address };
-    }
+    const Router = useRouter();
+    const [value, setValue] = useState("")
+    const [description, setDescription] = useState("")
+    const [recipient, setRecipient] = useState("")
+    const [loading, setLoading] = useState(false)
+    const [errorMessage, setErrorMessage] = useState("")
+    const { address } = Router.query
 
-    onSubmit = async (event) => {
+    // static async getInitialProps(props) {
+    //     const { address } = props.query;
+    //     return { address };
+    // }
+
+    const onSubmit = async (event) => {
         event.preventDefault();
-        const contract = Contract(this.props.address);
-        this.setState({ loading: true });
+        const contract = Contract(address);
+        // this.setState({ loading: true });
+        setLoading(true)
         try {
             const accounts = await window.ethereum.request({
                 method: "eth_requestAccounts",
             });
-            const { description, value, recipient } = this.state;
+            // const { description, value, recipient } = this.state;
             await contract.methods
                 .createRequest(description, web3.utils.toWei(value, "ether"), recipient)
                 .send({
                     from: accounts[0],
                 });
-            Router.pushRoute(`/contracts/${this.props.address}/requests`);
-            this.setState({ errorMessage: "" });
+            Router.push(`/contracts/${address}/requests`);
+            // this.setState({ errorMessage: "" });
+            setErrorMessage("")
         } catch (err) {
-            this.setState({ errorMessage: err.message });
+            // this.setState({ errorMessage: err.message });
+            setErrorMessage(err.message)
         }
-        this.setState({ loading: false });
+        // this.setState({ loading: false });
+        setLoading(false)
     };
 
-    render() {
+    // render() {
         return (
             <>
                 {/* <Layout> */}
-                <Link href={`/contracts/${this.props.address}/requests`}>
-                    <a>Back</a>
+                <Link href={`/contracts/${address}/requests`}>
+                    Back
                 </Link>
                 <h3>Create a Request</h3>
-                <Form onSubmit={this.onSubmit} error={!!this.state.errorMessage}>
+                <Form onSubmit={onSubmit} error={!!errorMessage}>
                     <Form.Field>
                         <label>Description</label>
                         <Input
-                            value={this.state.description}
+                            value={description}
                             onChange={(e) => {
-                                this.setState({ description: e.target.value });
+                                // this.setState({ description: e.target.value });
+                                setDescription(e.target.value)
                             }}
                         />
                     </Form.Field>
                     <Form.Field>
                         <label>Value in Ether</label>
                         <Input
-                            value={this.state.value}
+                            value={value}
                             onChange={(e) => {
-                                this.setState({ value: e.target.value });
+                                // this.setState({ value: e.target.value });
+                                setValue(e.target.value)
                             }}
                         />
                     </Form.Field>
                     <Form.Field>
                         <label>Recipient</label>
                         <Input
-                            value={this.state.recipient}
+                            value={recipient}
                             onChange={(e) => {
-                                this.setState({ recipient: e.target.value });
+                                // this.setState({ recipient: e.target.value });
+                                setRecipient(e.target.value)
                             }}
                         />
                     </Form.Field>
-                    <Button type="submit" loading={this.state.loading} primary>
+                    <Button type="submit" loading={loading} primary>
                         Create!
                     </Button>
-                    <Message error header="Oops" content={this.state.errorMessage} />
+                    <Message error header="Oops" content={errorMessage} />
                 </Form>
                 {/* </Layout> */}
             </>
         );
-    }
+    // }
 }

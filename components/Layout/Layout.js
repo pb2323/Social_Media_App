@@ -10,6 +10,7 @@ import {
   Segment,
 } from "semantic-ui-react";
 import nprogress from "nprogress";
+import ContractLayout from "../Contracts/Header";
 import Router, { useRouter } from "next/router";
 import SideMenu from "./SideMenu";
 import Search from "./Search";
@@ -28,6 +29,8 @@ function Layout({ children, user }) {
   const router = useRouter();
 
   const messagesRoute = router.pathname === "/messages";
+  const contractsRoute = router.pathname.includes("/contracts");
+  // console.log(contractsRoute);
 
   Router.onRouteChangeStart = () => nprogress.start();
   Router.onRouteChangeComplete = () => nprogress.done();
@@ -67,12 +70,26 @@ function Layout({ children, user }) {
                           </Sticky>
                         </Grid.Column>
                       </>
-                    ) : (
+                    ) : !contractsRoute ? (
                       <>
                         <Grid.Column floated="left" width={1} />
                         <Grid.Column width={15}>{children}</Grid.Column>
                       </>
-                    )}
+                    ) : (
+                      <>
+                        <Grid.Column floated="left" width={2}>
+                          <Sticky context={contextRef}>
+                            <SideMenu user={user} pc />
+                          </Sticky>
+                        </Grid.Column>
+
+                        <Grid.Column width={10}>
+                          <Visibility context={contextRef}>
+                            <ContractLayout />
+                            {children}
+                          </Visibility>
+                        </Grid.Column>
+                      </>)}
                   </Grid>
                 </Ref>
               </Media>

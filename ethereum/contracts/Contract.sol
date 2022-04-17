@@ -9,8 +9,8 @@ contract ContractFactory {
         deployedContracts[freelancer].push(newContract);
     }
 
-    function getDeployedContract() public view returns (address[]) {
-        return deployedContracts[msg.sender];
+    function getDeployedContract(address sender) public view returns (address[]) {
+        return deployedContracts[sender];
     }
 }
 
@@ -87,7 +87,10 @@ contract SmartContract {
             uint256,
             uint256,
             address,
-            address
+            address,
+            string,
+            bool,
+            bool
         )
     {
         return (
@@ -95,7 +98,10 @@ contract SmartContract {
             address(this).balance,
             requests.length,
             manager,
-            freelancer
+            freelancer,
+            project,
+            managerContributed,
+            freelancerContributed
         );
     }
 

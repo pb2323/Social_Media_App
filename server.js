@@ -73,10 +73,11 @@ io.on("connection", (socket) => {
   });
 
   socket.on("loadMessages", async ({ userId, messagesWith }) => {
-    const { chat, error } = await loadMessages(userId, messagesWith);
+    const { chat, error, userWallet, wallet } = await loadMessages(userId, messagesWith);
+    console.log(chat, error, userWallet, wallet, userId, messagesWith);
     !error
-      ? socket.emit("messagesLoaded", { chat })
-      : socket.emit("noChatFound");
+      ? socket.emit("messagesLoaded", { chat, userWallet, wallet })
+      : socket.emit("noChatFound", { error, userWallet, wallet });
   });
 
   socket.on("sendNewMsg", async ({ userId, msgSendToUserId, msg }) => {

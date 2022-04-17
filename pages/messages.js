@@ -23,7 +23,7 @@ const scrollDivToBottom = (divRef) =>
   divRef.current.scrollIntoView({ behaviour: "smooth" });
 
 function Messages({ chatsData, user }) {
-  const { call, callAccepted, setMe, setCall, callEnded, myVideo, setStream, connectionRef, setCallAccepted, leaveCall, userCalled, setToDefault, setUserCalled, setCallEnded } = useContext(SocketContext)
+  const { call, callAccepted, setMe, setCall, callEnded, myVideo, setStream, connectionRef, setCallAccepted, leaveCall, userCalled, setToDefault, setUserCalled, setCallEnded, setWallet, setUserWallet, wallet, userWallet } = useContext(SocketContext)
   const [chats, setChats] = useState(chatsData);
   const router = useRouter();
   const [open, setOpen] = useState(false)
@@ -33,6 +33,8 @@ function Messages({ chatsData, user }) {
 
   const [messages, setMessages] = useState([]);
   const [bannerData, setBannerData] = useState({ name: "", profilePicUrl: "", userId: '' });
+  // const [wallet, setWallet] = useState("")
+  // const [userWallet, setUserWallet] = useState("")
 
   const divRef = useRef();
 
@@ -127,23 +129,26 @@ function Messages({ chatsData, user }) {
         messagesWith: router.query.message,
       });
 
-      socket.current.on("messagesLoaded", async ({ chat }) => {
+      socket.current.on("messagesLoaded", async ({ chat, userWallet, wallet }) => {
         setMessages(chat.messages);
         setBannerData({
           name: chat.messagesWith.name,
           profilePicUrl: chat.messagesWith.profilePicUrl,
           userId: chat.messagesWith._id
         });
-
+        setWallet(wallet);
+        setUserWallet(userWallet);
         openChatId.current = chat.messagesWith._id;
         divRef.current && scrollDivToBottom(divRef);
       });
 
-      socket.current.on("noChatFound", async () => {
+      socket.current.on("noChatFound", async ({ wallet, userWallet }) => {
         const { name, profilePicUrl, userId } = await getUserInfo(router.query.message);
 
         setBannerData({ name, profilePicUrl, userId });
         setMessages([]);
+        setWallet(wallet);
+        setUserWallet(userWallet);
 
         openChatId.current = router.query.message;
       });
@@ -288,6 +293,7 @@ function Messages({ chatsData, user }) {
     if (userCalling.length > 0 && ele.messagesWith === userCalling[0].userId) acc = ele
     return acc;
   }, {})
+  console.log(wallet, userWallet);
   return (
     <>
       {/* <video ref={myVideo} height={0} width={0}></video> */}
@@ -299,7 +305,7 @@ function Messages({ chatsData, user }) {
           style={{ cursor: "pointer" }}
           secondary
         />
-        <Button icon="legal" primary style={{float:'right'}} content="Smart Contracts"/>
+        <Button icon="legal" onClick={() => router.push("/contracts")} primary style={{ float: 'right' }} content="Smart Contracts" />
         <Divider hidden />
 
         <div style={{ marginBottom: "10px" }}>

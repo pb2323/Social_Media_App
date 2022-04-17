@@ -72,7 +72,7 @@ router.post("/", async (req, res) => {
 
     let profileFields = {};
     profileFields.user = user._id;
-    // profileFields.wallet = wallet;
+    profileFields.wallet = wallet;
     profileFields.bio = bio;
 
     profileFields.social = {};

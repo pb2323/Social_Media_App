@@ -14,6 +14,8 @@ const ContextProvider = ({ children }) => {
     const [call, setCall] = useState({})
     const [callAccepted, setCallAccepted] = useState(false)
     const [callEnded, setCallEnded] = useState(false)
+    const [wallet, setWallet] = useState("")
+    const [userWallet, setUserWallet] = useState("")
     const myVideo = useRef()
     const userVideo = useRef()
     const connectionRef = useRef()
@@ -42,7 +44,7 @@ const ContextProvider = ({ children }) => {
     }
 
     const callUser = (id, currentStream, isVideoCall) => {
-        const initiator = new Peer({ initiator: true, trickle: false, stream:currentStream })
+        const initiator = new Peer({ initiator: true, trickle: false, stream: currentStream })
         initiator.on('signal', (data) => {
             socket.emit("calluser", { userToCall: id, signalData: JSON.stringify(data), from: me, isVideoCall })
         })
@@ -111,7 +113,11 @@ const ContextProvider = ({ children }) => {
             userCalled,
             setUserCalled,
             setToDefault,
-            rejectCall
+            rejectCall,
+            wallet,
+            userWallet,
+            setWallet,
+            setUserWallet
         }}>
             {children}
         </SocketContext.Provider>

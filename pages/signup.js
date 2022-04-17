@@ -55,7 +55,7 @@ function Signup() {
   const inputRef = useRef();
 
   useEffect(() => {
-    const isUser = Object.values({ name, email, password, bio }).every((item) =>
+    const isUser = Object.values({ name, email, password, bio, wallet }).every((item) =>
       Boolean(item)
     );
     isUser ? setSubmitDisabled(false) : setSubmitDisabled(true);

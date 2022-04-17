@@ -1,5 +1,6 @@
 const ChatModel = require("../models/ChatModel");
 const UserModel = require("../models/UserModel");
+const ProfileModel = require("../models/ProfileModel");
 
 const loadMessages = async (userId, messagesWith) => {
   try {
@@ -11,11 +12,15 @@ const loadMessages = async (userId, messagesWith) => {
       (chat) => chat.messagesWith._id.toString() === messagesWith
     );
 
+    const userProfile = await ProfileModel.findOne({ user: userId });
+    const profile = await ProfileModel.findOne({ user: messagesWith });
+
     if (!chat) {
-      return { error: "No chat found" };
+      return { error: "No chat found", userWallet: userProfile.wallet, wallet: profile.wallet };
     }
 
-    return { chat };
+
+    return { chat, userWallet: userProfile.wallet, wallet: profile.wallet };
   } catch (error) {
     console.error(error);
     return { error };
