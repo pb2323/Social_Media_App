@@ -7,10 +7,11 @@ import {
   Form,
   Button,
 } from "semantic-ui-react";
-import { passwordUpdate, toggleMessagePopup } from "../../utils/profileActions";
+import { passwordUpdate, toggleMessagePopup, walletUpdate } from "../../utils/profileActions";
 
 function Settings({ newMessagePopup }) {
   const [passwordFields, showPasswordFields] = useState(false);
+  const [metamaskField, showMetamaskField] = useState(false)
 
   const [newMessageSettings, showNewMessageSettings] = useState(false);
 
@@ -89,6 +90,25 @@ function Settings({ newMessagePopup }) {
           </div>
         </List.Item>
 
+        <Divider />
+
+        <List.Item>
+          <List.Icon name="ethereum" size="large" verticalAlign="middle" />
+          <List.Content>
+            <List.Header
+              onClick={() => showMetamaskField(!metamaskField)}
+              as="a"
+              content="Update Metamask wallet"
+            />
+          </List.Content>
+
+          {metamaskField && (
+            <UpdateMetamask
+              setSuccess={setSuccess}
+              showMetamaskField={showMetamaskField}
+            />
+          )}
+        </List.Item>
         <Divider />
       </List>
     </>
@@ -192,6 +212,90 @@ const UpdatePassword = ({ setSuccess, showPasswordFields }) => {
               type="button"
               content="Cancel"
               onClick={() => showPasswordFields(false)}
+            />
+
+            <Message icon="meh" error header="Oops!" content={errorMsg} />
+          </List.Item>
+        </List.List>
+      </Form>
+      <Divider hidden />
+    </>
+  );
+};
+
+const UpdateMetamask = ({ setSuccess, showMetamaskField }) => {
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setError] = useState(null);
+
+  const [userMetamask, setUserMetamask] = useState('');
+  // const [typed, showTyped] = useState(false);
+
+  // const { field1, field2 } = typed;
+
+  // const { currentPassword, newPassword } = userMetamask;
+
+  const handleChange = (e) => {
+    const { value } = e.target;
+    setUserMetamask(value);
+  };
+
+  useEffect(() => {
+    errorMsg && setTimeout(() => setError(null), 5000);
+  }, [errorMsg]);
+
+  return (
+    <>
+      <Form
+        error={errorMsg !== null}
+        loading={loading}
+        onSubmit={async (e) => {
+          e.preventDefault();
+          setLoading(true);
+
+          await walletUpdate(setSuccess, userMetamask);
+          setLoading(false);
+
+          showMetamaskField(false);
+        }}
+      >
+        <List.List>
+          <List.Item>
+            <Form.Input
+              fluid
+              // icon={{
+              //   name: "eye",
+              //   circular: true,
+              //   link: true,
+              //   onClick: () =>
+              //     showTyped(!typed),
+              // }}
+              type="text"
+              // iconPosition="left"
+              label="New Wallet Address"
+              placeholder="For eg 0x7CC00206d1cFd032f834B3320F47FF64e7A470bF"
+              name="newWalletAddress"
+              onChange={handleChange}
+              value={userMetamask}
+            />
+
+            {/* BUTTONS */}
+
+            <Button
+              disabled={loading || userMetamask === ""}
+              compact
+              icon="configure"
+              type="submit"
+              color="teal"
+              content="Confirm"
+            />
+
+            <Button
+              disabled={loading}
+              compact
+              icon="cancel"
+              type="button"
+              content="Cancel"
+              onClick={() => showMetamaskField(false)}
             />
 
             <Message icon="meh" error header="Oops!" content={errorMsg} />

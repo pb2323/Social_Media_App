@@ -34,19 +34,21 @@ export default function ContractForm({ address, manager, freelancer }) {
       if (accounts[0] === manager.toLowerCase() || accounts[0] === manager)
         await contract.methods.managerContribute().send({
           from: accounts[0],
-          value: web3.utils.toWei(value, "ether"),
+          // value: web3.utils.toWei(value, "ether"),
+          value: value
         });
       else if (accounts[0] === freelancer.toLowerCase() || accounts[0] === freelancer)
         await contract.methods.freelancerContribute().send({
           from: accounts[0],
-          value: web3.utils.toWei(value, "ether"),
+          // value: web3.utils.toWei(value, "ether"),
+          value: value
         });
       else
         throw new Error("You are not authenticated to contribute to this contract")
       // this.setState({ loading: false, errorMessage: "" });
       setLoading(false);
       setErrorMessage("");
-      Router.replace(`/contracts/${address}`);
+      Router.reload(`/contracts/${address}`);
       // this.setState({ errorMessage: "" });
       setErrorMessage("");
     } catch (err) {
@@ -82,7 +84,7 @@ export default function ContractForm({ address, manager, freelancer }) {
       // this.setState({ loading: false, errorMessage: "" });
       setLoadingProject(false);
       setErrorMessageProject("");
-      Router.replace(`/contracts/${address}`);
+      Router.reload(`/contracts/${address}`);
       // this.setState({ errorMessage: "" });
       setErrorMessageProject("");
     } catch (err) {
@@ -100,7 +102,7 @@ export default function ContractForm({ address, manager, freelancer }) {
         <Form.Field>
           <label>Amount to Contribute</label>
           <Input
-            label="ether"
+            label="wei"
             onChange={(e) => {
               // this.setState({ value: e.target.value });
               setValue(e.target.value);

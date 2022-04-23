@@ -293,7 +293,7 @@ function Messages({ chatsData, user }) {
     if (userCalling.length > 0 && ele.messagesWith === userCalling[0].userId) acc = ele
     return acc;
   }, {})
-  console.log(wallet, userWallet);
+  // console.log(wallet, userWallet);
   return (
     <>
       {/* <video ref={myVideo} height={0} width={0}></video> */}
@@ -305,7 +305,7 @@ function Messages({ chatsData, user }) {
           style={{ cursor: "pointer" }}
           secondary
         />
-        <Button icon="legal" onClick={() => router.push("/contracts")} primary style={{ float: 'right' }} content="Smart Contracts" />
+        <Button icon="legal" disabled={chats.length === 0} onClick={() => router.push("/contracts")} primary style={{ float: 'right' }} content="Smart Contracts" />
         <Divider hidden />
 
         <div style={{ marginBottom: "10px" }}>

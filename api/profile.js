@@ -258,6 +258,29 @@ router.post("/settings/password", authMiddleware, async (req, res) => {
   }
 });
 
+// UPDATE WALLET
+router.post("/settings/wallet", authMiddleware, async (req, res) => {
+  try {
+    const { wallet } = req.body;
+
+    const profile = await ProfileModel.findOne({ user: req.userId });
+
+    // const isPassword = await bcrypt.compare(currentPassword, user.password);
+
+    // if (!isPassword) {
+    //   return res.status(401).send("Invalid Password");
+    // }
+
+    profile.wallet = wallet;
+    await profile.save();
+
+    res.status(200).send("Updated successfully");
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send("Server Error");
+  }
+});
+
 // UPDATE MESSAGE POPUP SETTINGS
 router.post("/settings/messagePopup", authMiddleware, async (req, res) => {
   try {

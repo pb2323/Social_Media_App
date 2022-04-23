@@ -40,7 +40,8 @@ export default function NewRequest() {
             });
             // const { description, value, recipient } = this.state;
             await contract.methods
-                .createRequest(description, web3.utils.toWei(value, "ether"), recipient)
+                // .createRequest(description, web3.utils.toWei(value, "ether"), recipient)
+                .createRequest(description, value, recipient)
                 .send({
                     from: accounts[0],
                 });
@@ -56,51 +57,53 @@ export default function NewRequest() {
     };
 
     // render() {
-        return (
-            <>
-                {/* <Layout> */}
-                <Link href={`/contracts/${address}/requests`}>
+    return (
+        <>
+            {/* <Layout> */}
+            <Link href={`/contracts/${address}/requests`}>
+                <Button primary style={{ marginTop: '10px' }}>
                     Back
-                </Link>
-                <h3>Create a Request</h3>
-                <Form onSubmit={onSubmit} error={!!errorMessage}>
-                    <Form.Field>
-                        <label>Description</label>
-                        <Input
-                            value={description}
-                            onChange={(e) => {
-                                // this.setState({ description: e.target.value });
-                                setDescription(e.target.value)
-                            }}
-                        />
-                    </Form.Field>
-                    <Form.Field>
-                        <label>Value in Ether</label>
-                        <Input
-                            value={value}
-                            onChange={(e) => {
-                                // this.setState({ value: e.target.value });
-                                setValue(e.target.value)
-                            }}
-                        />
-                    </Form.Field>
-                    <Form.Field>
-                        <label>Recipient</label>
-                        <Input
-                            value={recipient}
-                            onChange={(e) => {
-                                // this.setState({ recipient: e.target.value });
-                                setRecipient(e.target.value)
-                            }}
-                        />
-                    </Form.Field>
-                    <Button type="submit" loading={loading} primary>
-                        Create!
-                    </Button>
-                    <Message error header="Oops" content={errorMessage} />
-                </Form>
-                {/* </Layout> */}
-            </>
-        );
+                </Button>
+            </Link>
+            <h3>Create a Request</h3>
+            <Form onSubmit={onSubmit} error={!!errorMessage}>
+                <Form.Field>
+                    <label>Description</label>
+                    <Input
+                        value={description}
+                        onChange={(e) => {
+                            // this.setState({ description: e.target.value });
+                            setDescription(e.target.value)
+                        }}
+                    />
+                </Form.Field>
+                <Form.Field>
+                    <label>Value in Wei</label>
+                    <Input
+                        value={value}
+                        onChange={(e) => {
+                            // this.setState({ value: e.target.value });
+                            setValue(e.target.value)
+                        }}
+                    />
+                </Form.Field>
+                <Form.Field>
+                    <label>Recipient</label>
+                    <Input
+                        value={recipient}
+                        onChange={(e) => {
+                            // this.setState({ recipient: e.target.value });
+                            setRecipient(e.target.value)
+                        }}
+                    />
+                </Form.Field>
+                <Button type="submit" loading={loading} primary>
+                    Create!
+                </Button>
+                <Message error header="Oops" content={errorMessage} />
+            </Form>
+            {/* </Layout> */}
+        </>
+    );
     // }
 }

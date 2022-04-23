@@ -74,6 +74,17 @@ export const passwordUpdate = async (setSuccess, userPasswords) => {
   }
 };
 
+export const walletUpdate = async (setSuccess, wallet) => {
+  // const { currentPassword, newPassword } = userPasswords;
+  try {
+    await Axios.post(`/settings/wallet`, { wallet });
+
+    setSuccess(true);
+  } catch (error) {
+    console.error(catchErrors(error));
+  }
+};
+
 export const toggleMessagePopup = async (
   popupSetting,
   setPopupSetting,

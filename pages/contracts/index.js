@@ -50,7 +50,7 @@ function Index() {
 
   return (
     <>
-      {!loading ? <><h3>Open Contracts</h3>
+      {!loading ? <><h3>Contracts</h3>
         <Link href="/contracts/new">
           <Button
             floated="right"

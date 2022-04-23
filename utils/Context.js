@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, createContext } from 'react'
 import io from 'socket.io-client'
 import Peer from 'simple-peer'
 import baseUrl from './baseUrl'
+import useLocalStorage from './hooks';
 
 const SocketContext = createContext()
 const socket = io(baseUrl)
@@ -14,8 +15,8 @@ const ContextProvider = ({ children }) => {
     const [call, setCall] = useState({})
     const [callAccepted, setCallAccepted] = useState(false)
     const [callEnded, setCallEnded] = useState(false)
-    const [wallet, setWallet] = useState("")
-    const [userWallet, setUserWallet] = useState("")
+    const [wallet, setWallet] = useLocalStorage("wallet", "")
+    const [userWallet, setUserWallet] = useLocalStorage("userWallet", "")
     const myVideo = useRef()
     const userVideo = useRef()
     const connectionRef = useRef()

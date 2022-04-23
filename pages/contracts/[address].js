@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useRouter } from 'next/router';
 import { add } from "lodash";
 
-export default function show() {
+export default function show({ Wallet }) {
     // static async getInitialProps(props) {
     //     const contract = Contract(props.query.address);
     //     const summary = await contract.methods.getSummary().call();
@@ -39,6 +39,11 @@ export default function show() {
             setLoading(true);
             const contract = Contract(address);
             const summary = await contract.methods.getSummary().call();
+            console.log(Wallet, summary[3], summary[4]);
+            if(Wallet !== summary[3] && Wallet !== summary[4]) {
+                router.push("/")
+                return;
+            }
             setMinimumContribution(summary[0])
             setBalance(summary[1]);
             setRequestsCount(summary[2])
@@ -50,6 +55,7 @@ export default function show() {
             setLoading(false);
         };
         getSummary();
+        console.log(Wallet, manager, freelancer);
     }, [])
 
     const renderCards = () => {
@@ -65,24 +71,24 @@ export default function show() {
                 header: manager,
                 meta: "Address of the Manager",
                 description:
-                    "The manager created this contract and can create requests to withdraw money",
+                    "The manager created this contract and has the ability to approve transfer request from the contract.",
                 style: { overflowWrap: "break-word" },
             },
             {
-                header: minimumContribution,
+                header: Wallet === manager ? minimumContribution : minimumContribution / 2,
                 meta: "Minimum Contribution (wei)",
                 description:
-                    "You must contribute atleast this much wei to become an approver",
+                    Wallet === manager ? "You must contribute this much wei as a gurantee to the freelancer" : "You must contribute this much wei as a gurantee to the manager",
             },
             {
                 header: requestsCount,
                 meta: "Number of requests",
                 description:
-                    "A request tries to withdraw money from the contract. Requests must be approved by the users",
+                    "A request tries to withdraw money from the contract. Requests must be approved by the manager",
             },
             {
                 header: balance,
-                meta: "Contract Balance (ethers)",
+                meta: "Contract Balance (wei)",
                 description:
                     "The balance is how much money this contract has left to spend.",
             },
@@ -90,30 +96,30 @@ export default function show() {
                 header: freelancer,
                 meta: "Address of the Freelancer",
                 description:
-                    "The balance is how much money this contract has left to spend.",
+                    "The freelancer will work on the project assigned and has the ability to create requests for transfer of wei.",
                 style: { overflowWrap: "break-word" },
             },
             {
                 header: !!project ? project : address,
                 meta: "Name of the project",
                 description:
-                    "The balance is how much money this contract has left to spend.",
+                    "The project name decided. Both the parties have ability to change the project name.",
                 style: { overflowWrap: "break-word" },
             },
             {
                 header: managerContributed ? "YES" : "NO",
                 meta: "Manager contribution status",
-                // description:
-                //     "The balance is how much money this contract has left to spend.",
+                description:
+                    "The manager has contributed to the contract",
             },
             {
                 header: freelancerContributed ? "YES" : "NO",
                 meta: "Freelancer contribution status",
                 description:
-                    "The balance is how much money this contract has left to spend.",
+                    "The freelancer has contributed to the contract",
             },
         ];
-        console.log(items);
+        // console.log(items);
         return <Card.Group items={items} />;
     }
 
@@ -121,7 +127,7 @@ export default function show() {
     return (
         <>
             {/* //   <Layout> */}
-            <h3>Contract Show</h3>
+            <Link href='/contracts'><Button primary style={{ marginTop: '10px', marginBottom: '10px' }}>Show contracts</Button></Link>
             <Grid>
                 <Grid.Row>
                     <Grid.Column width="10">{renderCards()}</Grid.Column>
