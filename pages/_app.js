@@ -4,6 +4,7 @@ import { parseCookies, destroyCookie } from "nookies";
 import baseUrl from "../utils/baseUrl";
 import { redirectUser } from "../utils/authUser";
 import Layout from "../components/Layout/Layout";
+import Loader from '../components/Layout/Loader';
 import { ContextProvider } from '../utils/Context'
 import "react-toastify/dist/ReactToastify.css";
 import "semantic-ui-css/semantic.min.css";
@@ -64,6 +65,7 @@ class MyApp extends App {
       <ContextProvider>
         <Layout {...pageProps}>
           <Component {...pageProps} />
+          <Loader />
         </Layout>
       </ContextProvider>
     );

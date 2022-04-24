@@ -17,6 +17,7 @@ const ContextProvider = ({ children }) => {
     const [callEnded, setCallEnded] = useState(false)
     const [wallet, setWallet] = useLocalStorage("wallet", "")
     const [userWallet, setUserWallet] = useLocalStorage("userWallet", "")
+    const [loading, setLoading] = useState(false)
     const myVideo = useRef()
     const userVideo = useRef()
     const connectionRef = useRef()
@@ -118,7 +119,9 @@ const ContextProvider = ({ children }) => {
             wallet,
             userWallet,
             setWallet,
-            setUserWallet
+            setUserWallet,
+            loading,
+            setLoading
         }}>
             {children}
         </SocketContext.Provider>

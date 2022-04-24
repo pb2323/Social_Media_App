@@ -59,7 +59,7 @@ export default function RequestRow({ id, request, address, Wallet, manager }) {
         </Cell> */}
       <Cell>
         {request.completed ? null : (
-          <Button color="teal" disabled={Wallet === manager} loading={loading} basic onClick={onApprove}>
+          <Button color="teal" disabled={Wallet !== manager} loading={loading} basic onClick={onApprove}>
             Approve
           </Button>
         )}

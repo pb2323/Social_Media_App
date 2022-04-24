@@ -3,6 +3,7 @@ import React, { useEffect, useState, useContext } from "react";
 import { Button, Table } from "semantic-ui-react";
 // import Layout from "../../../components/Layout";
 import Contract from "../../../ethereum/contract";
+import { SocketContext } from '../../../utils/Context'
 import RequestRow from "../../../components/Contracts/RequestRow";
 import { useRouter } from 'next/router';
 
@@ -29,7 +30,8 @@ export default function Requests({ Wallet }) {
     const { address } = router.query
     const [requests, setRequests] = useState([])
     const [requestsCount, setRequestsCount] = useState(0)
-    const [loading, setLoading] = useState(false)
+    // const [loading, setLoading] = useState(false)
+    const { setLoading } = useContext(SocketContext)
     const [manager, setManager] = useState("")
     const [freelancer, setFreelancer] = useState("")
     const { Header, Row, HeaderCell, Body } = Table;
@@ -98,7 +100,7 @@ export default function Requests({ Wallet }) {
             </Link>
             <Link href={`/contracts/${address}/requests/new`}>
                 <Button
-                    // disabled={Wallet === manager}
+                    disabled={Wallet === manager}
                     floated="right" style={{ marginBottom: "10px" }} primary>
                     Add Request
                 </Button>

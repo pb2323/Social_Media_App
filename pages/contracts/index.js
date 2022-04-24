@@ -7,17 +7,17 @@ import Link from "next/link";
 import { useRouter } from 'next/router'
 import _ from 'lodash';
 
-function Index() {
+function Index({ Wallet }) {
 
   const router = useRouter()
   const [contracts, setContracts] = useState([])
-  const [loading, setLoading] = useState(false)
-  const { wallet, userWallet } = useContext(SocketContext)
+  // const [loading, setLoading] = useState(false)
+  const { wallet, loading, setLoading } = useContext(SocketContext)
 
   useEffect(() => {
-    // const wallet="0x7CC00206d1cFd032f834B3320F47FF64e7A470bF", userWallet="0x7CC00206d1cFd032f834B3320F47FF64e7A470bF"
+    // const wallet="0x7CC00206d1cFd032f834B3320F47FF64e7A470bF", Wallet="0x7CC00206d1cFd032f834B3320F47FF64e7A470bF"
     const getContracts = async () => {
-      if (!wallet || !userWallet) {
+      if (!wallet || !Wallet) {
         router.push("/");
         return;
       }
@@ -25,7 +25,7 @@ function Index() {
       // console.log('calling');
       const contract = await ContractFactory.methods.getDeployedContract(wallet).call();
       // console.log(contract);
-      const userContract = await ContractFactory.methods.getDeployedContract(userWallet).call();
+      const userContract = await ContractFactory.methods.getDeployedContract(Wallet).call();
       const intersection = _.intersection(contract, userContract);
       setLoading(false)
       setContracts(intersection)
@@ -60,7 +60,7 @@ function Index() {
           />
         </Link>
         {renderContracts()}
-      </> : <h1>Loading...</h1>}
+      </> : <></>}
     </>
   )
 }
@@ -80,11 +80,11 @@ renderContracts()
 </div> */}
 
   // Index.getInitialProps = async (ctx) => {
-  //     // const { wallet, userWallet } = useContext(SocketContext)
-  //     // console.log(wallet, userWallet);
-  //   const wallet="0x7CC00206d1cFd032f834B3320F47FF64e7A470bF", userWallet="0x7CC00206d1cFd032f834B3320F47FF64e7A470bF"
+  //     // const { wallet, Wallet } = useContext(SocketContext)
+  //     // console.log(wallet, Wallet);
+  //   const wallet="0x7CC00206d1cFd032f834B3320F47FF64e7A470bF", Wallet="0x7CC00206d1cFd032f834B3320F47FF64e7A470bF"
   //     const contract = await ContractFactory.methods.getDeployedContract(wallet).call();
-  //     const userContract = await ContractFactory.methods.getDeployedContract(userWallet).call();
+  //     const userContract = await ContractFactory.methods.getDeployedContract(Wallet).call();
   //     console.log(contract, userContract);
   //     return { contract };
   // }

@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 // import Layout from "../../components/Layout";
 import { Button, Card, Grid } from "semantic-ui-react";
 import Contract from "../../ethereum/contract";
 import web3 from "../../ethereum/web3";
 import ContractForm from "../../components/Contracts/ContractForm";
+import { SocketContext } from '../../utils/Context'
 import Link from "next/link";
 import { useRouter } from 'next/router';
 import { add } from "lodash";
@@ -30,7 +31,7 @@ export default function show({ Wallet }) {
     const [managerContributed, setManagerContributed] = useState(false)
     const [freelancerContributed, setFreelancerContributed] = useState(false)
     const router = useRouter()
-    const [loading, setLoading] = useState(false);
+    const { setLoading } = useContext(SocketContext)
     // const [errorMessage, setErrorMessage] = useState("");
     const { address } = router.query
 
@@ -39,7 +40,6 @@ export default function show({ Wallet }) {
             setLoading(true);
             const contract = Contract(address);
             const summary = await contract.methods.getSummary().call();
-            console.log(Wallet, summary[3], summary[4]);
             if(Wallet !== summary[3] && Wallet !== summary[4]) {
                 router.push("/")
                 return;
@@ -55,7 +55,6 @@ export default function show({ Wallet }) {
             setLoading(false);
         };
         getSummary();
-        console.log(Wallet, manager, freelancer);
     }, [])
 
     const renderCards = () => {
