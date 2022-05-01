@@ -7,7 +7,7 @@ const provider = new HDWalletProvider(
     "https://rinkeby.infura.io/v3/8d6c93f8a12343899af966a5f99c85fa"
 );
 
-const web3 = new Web3(process.env.MODE === 'local' ? (new Web3.providers.HttpProvider("http://127.0.0.1:7545")) : provider);
+const web3 = new Web3(provider);
 
 const deploy = async () => {
     try {

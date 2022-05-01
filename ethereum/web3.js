@@ -8,6 +8,6 @@ if (typeof window !== "undefined" && typeof window.web3 !== "undefined") {
   const provider = new Web3.providers.HttpProvider(
     "https://rinkeby.infura.io/v3/8d6c93f8a12343899af966a5f99c85fa"
   );
-  web3 = new Web3(process.env.MODE === 'local' ? (new Web3.providers.HttpProvider("http://localhost:7545")) : provider);
+  web3 = new Web3(provider);
 }
 export default web3
