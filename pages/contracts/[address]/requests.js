@@ -1,6 +1,6 @@
 import Link from "next/link";
 import React, { useEffect, useState, useContext } from "react";
-import { Button, Table } from "semantic-ui-react";
+import { Button, Table, Message } from "semantic-ui-react";
 // import Layout from "../../../components/Layout";
 import Contract from "../../../ethereum/contract";
 import { SocketContext } from '../../../utils/Context'
@@ -31,9 +31,11 @@ export default function Requests({ Wallet }) {
     const [requests, setRequests] = useState([])
     const [requestsCount, setRequestsCount] = useState(0)
     // const [loading, setLoading] = useState(false)
-    const { setLoading } = useContext(SocketContext)
+    const [errorMessage, setErrorMessage] = useState("")
+    const { setLoading, loading } = useContext(SocketContext)
     const [manager, setManager] = useState("")
     const [freelancer, setFreelancer] = useState("")
+    const [guarantor, setGuarantor] = useState("")
     const { Header, Row, HeaderCell, Body } = Table;
 
     useEffect(() => {
@@ -42,11 +44,10 @@ export default function Requests({ Wallet }) {
                 setLoading(true)
                 // const { address } = props.query;
                 const contract = Contract(address);
-                const manager = await contract.methods.manager().call();
-                const freelancer = await contract.methods.freelancer().call();
+                const addresses = await contract.methods.getAddress().call();
                 const requestsCount = await contract.methods.getRequestsCount().call();
-                
-                if (Wallet !== manager && Wallet !== freelancer) {
+
+                if (Wallet !== addresses[0] && Wallet !== addresses[1] && Wallet !== addresses[2]) {
                     router.push("/")
                     return;
                 }
@@ -59,15 +60,20 @@ export default function Requests({ Wallet }) {
                 }
                 setRequests(Requests)
                 setRequestsCount(requestsCount)
-                setManager(manager)
-                setFreelancer(freelancer)
+                setManager(addresses[1])
+                setFreelancer(addresses[0])
+                setGuarantor(addresses[2])
                 setLoading(false)
+                setErrorMessage("")
                 // return { address, requests: Requests, requestsCount, approversCount };
             } catch (err) {
                 // const { address } = props.query;
                 // return { address };
-                console.error(err.message)
+                // console.error(err.message)
+                setErrorMessage(err.message)
+                setLoading(false)
             }
+            setLoading(false)
         }
         getData();
     }, [])
@@ -82,7 +88,9 @@ export default function Requests({ Wallet }) {
                     request={x}
                     address={address ? address : ""}
                     manager={manager}
+                    guarantor={guarantor}
                     Wallet={Wallet}
+                    setErrorMessage={setErrorMessage}
                 />
             ))
         );
@@ -100,7 +108,7 @@ export default function Requests({ Wallet }) {
             </Link>
             <Link href={`/contracts/${address}/requests/new`}>
                 <Button
-                    disabled={Wallet === manager}
+                    disabled={(Wallet !== freelancer && Wallet !== guarantor) || loading}
                     floated="right" style={{ marginBottom: "10px" }} primary>
                     Add Request
                 </Button>
@@ -122,6 +130,7 @@ export default function Requests({ Wallet }) {
             <div>
                 Found <strong>{requestsCount}</strong> Requests
             </div>
+            <Message hidden={!!!errorMessage} error header="Oops" content={errorMessage} />
             {/* </Layout> */}
         </>
     );

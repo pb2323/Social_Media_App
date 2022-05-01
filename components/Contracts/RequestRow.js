@@ -4,7 +4,7 @@ import Contract from "../../ethereum/contract";
 import web3 from "../../ethereum/web3";
 import { useRouter } from "next/router";
 
-export default function RequestRow({ id, request, address, Wallet, manager }) {
+export default function RequestRow({ id, request, address, Wallet, manager, setErrorMessage, guarantor }) {
 
   const Router = useRouter();
   const { Row, Cell } = Table;
@@ -24,16 +24,23 @@ export default function RequestRow({ id, request, address, Wallet, manager }) {
   // };
 
   const onApprove = async () => {
-    const contract = Contract(address);
-    setLoading(true)
-    const accounts = await window.ethereum.request({
-      method: "eth_requestAccounts",
-    });
-    await contract.methods
-      .finalizeRequest(id)
-      .send({ from: accounts[0] });
+    try {
+      const contract = Contract(address);
+      setLoading(true)
+      const accounts = await window.ethereum.request({
+        method: "eth_requestAccounts",
+      });
+      await contract.methods
+        .finalizeRequest(id)
+        .send({ from: accounts[0] });
+      setLoading(false)
+      Router.reload(`/contracts/${address}/requests`);
+      setErrorMessage("")
+    } catch (err) {
+      setErrorMessage(err.message);
+      setLoading(false)
+    }
     setLoading(false)
-    Router.reload(`/contracts/${address}/requests`);
   };
 
   // render() {
@@ -59,7 +66,7 @@ export default function RequestRow({ id, request, address, Wallet, manager }) {
         </Cell> */}
       <Cell>
         {request.completed ? null : (
-          <Button color="teal" disabled={Wallet !== manager} loading={loading} basic onClick={onApprove}>
+          <Button color="teal" disabled={Wallet !== manager && Wallet !== guarantor} loading={loading} basic onClick={onApprove}>
             Approve
           </Button>
         )}

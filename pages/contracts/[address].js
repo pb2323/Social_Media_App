@@ -27,6 +27,7 @@ export default function show({ Wallet }) {
     const [requestsCount, setRequestsCount] = useState(0);
     const [manager, setManager] = useState("");
     const [freelancer, setFreelancer] = useState("")
+    const [guarantor, setGuarantor] = useState("")
     const [project, setProject] = useState("")
     const [managerContributed, setManagerContributed] = useState(false)
     const [freelancerContributed, setFreelancerContributed] = useState(false)
@@ -40,7 +41,7 @@ export default function show({ Wallet }) {
             setLoading(true);
             const contract = Contract(address);
             const summary = await contract.methods.getSummary().call();
-            if(Wallet !== summary[3] && Wallet !== summary[4]) {
+            if (Wallet !== summary[3] && Wallet !== summary[4] && Wallet !== summary[8]) {
                 router.push("/")
                 return;
             }
@@ -52,6 +53,7 @@ export default function show({ Wallet }) {
             setProject(summary[5])
             setManagerContributed(summary[6])
             setFreelancerContributed(summary[7])
+            setGuarantor(summary[8])
             setLoading(false);
         };
         getSummary();
@@ -68,22 +70,22 @@ export default function show({ Wallet }) {
         const items = [
             {
                 header: manager,
-                meta: "Address of the Manager",
+                meta: "Address of the Client",
                 description:
-                    "The manager created this contract and has the ability to approve transfer request from the contract.",
+                    "The client created this contract and has the ability to approve transfer request from the contract.",
                 style: { overflowWrap: "break-word" },
             },
             {
                 header: Wallet === manager ? minimumContribution : minimumContribution / 2,
                 meta: "Minimum Contribution (wei)",
                 description:
-                    Wallet === manager ? "You must contribute this much wei as a gurantee to the freelancer" : "You must contribute this much wei as a gurantee to the manager",
+                    Wallet === manager ? "You must contribute this much wei as a gurantee to the freelancer" : "You must contribute this much wei as a gurantee to the client",
             },
             {
                 header: requestsCount,
                 meta: "Number of requests",
                 description:
-                    "A request tries to withdraw money from the contract. Requests must be approved by the manager",
+                    "A request tries to withdraw money from the contract. Requests must be approved by the client",
             },
             {
                 header: balance,
@@ -107,9 +109,9 @@ export default function show({ Wallet }) {
             },
             {
                 header: managerContributed ? "YES" : "NO",
-                meta: "Manager contribution status",
+                meta: "Client contribution status",
                 description:
-                    "The manager has contributed to the contract",
+                    "The Client has contributed to the contract",
             },
             {
                 header: freelancerContributed ? "YES" : "NO",
@@ -117,6 +119,12 @@ export default function show({ Wallet }) {
                 description:
                     "The freelancer has contributed to the contract",
             },
+            {
+                header: guarantor,
+                meta: "Address of the Guarantor",
+                description:
+                    "The guarantor is the person who has the ability to approve the transfer request from the freelancer or create a new request for transfer of wei.",
+            }
         ];
         // console.log(items);
         return <Card.Group items={items} />;

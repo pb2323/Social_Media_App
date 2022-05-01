@@ -32,7 +32,7 @@ export default function ContractForm({ address, manager, freelancer }) {
       });
       // console.log(accounts[0], manager, freelancer);
       if (accounts[0] === manager.toLowerCase() || accounts[0] === manager)
-        await contract.methods.managerContribute().send({
+        await contract.methods.clientContribute().send({
           from: accounts[0],
           // value: web3.utils.toWei(value, "ether"),
           value: value
