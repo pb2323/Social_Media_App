@@ -2,15 +2,21 @@ pragma solidity ^0.4.17;
 
 contract ContractFactory {
     mapping(address=>address[]) public deployedContracts;
+    mapping(address => address[]) public guarantorContracts;
 
     function createContract(uint256 minimum, address freelancer, address guarantor) public {
         address newContract = new SmartContract(minimum, msg.sender, freelancer, guarantor);
         deployedContracts[msg.sender].push(newContract);
         deployedContracts[freelancer].push(newContract);
+        guarantorContracts[guarantor].push(newContract);
     }
 
     function getDeployedContract(address sender) public view returns (address[]) {
         return deployedContracts[sender];
+    }
+
+    function getGuarantorContracts(address sender) public view returns (address[]) {
+        return guarantorContracts[sender];
     }
 }
 

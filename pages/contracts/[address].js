@@ -41,6 +41,7 @@ export default function show({ Wallet }) {
             setLoading(true);
             const contract = Contract(address);
             const summary = await contract.methods.getSummary().call();
+            console.log(Wallet);
             if (Wallet !== summary[3] && Wallet !== summary[4] && Wallet !== summary[8]) {
                 router.push("/")
                 return;
@@ -124,6 +125,7 @@ export default function show({ Wallet }) {
                 meta: "Address of the Guarantor",
                 description:
                     "The guarantor is the person who has the ability to approve the transfer request from the freelancer or create a new request for transfer of wei.",
+                style: { overflowWrap: "break-word" },
             }
         ];
         // console.log(items);

@@ -23,6 +23,7 @@ class MyApp extends App {
       ctx.pathname === "/search" ||
       ctx.pathname === "/contracts" ||
       ctx.pathname === "/contracts/new" ||
+      ctx.pathname === "/contracts/guarantor" ||
       ctx.pathname === "/contracts/[address]" ||
       ctx.pathname === "/contracts/[address]/requests" ||
       ctx.pathname === "/contracts/[address]/requests/new";

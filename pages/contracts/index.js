@@ -38,7 +38,7 @@ function Index({ Wallet }) {
       return {
         header: address,
         description: (
-          <Link href={`contracts/${address}`}>
+          <Link href={`/contracts/${address}`}>
             <a>View Contract</a>
           </Link>
         ),
@@ -51,6 +51,13 @@ function Index({ Wallet }) {
   return (
     <>
       {!loading ? <><h3>Contracts</h3>
+        <Link href="/contracts/guarantor">
+          <Button
+            content="View Guarantor Contracts"
+            primary
+            style={{ marginBottom: "10px" }}
+          />
+        </Link>
         <Link href="/contracts/new">
           <Button
             floated="right"
