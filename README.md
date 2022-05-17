@@ -1,2 +1,2 @@
-# Social_Media_App
-https://mini-instagram-india.herokuapp.com/
+# Social Media App For Freelancers
+https://network-in.herokuapp.com/
