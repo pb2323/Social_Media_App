@@ -67,3 +67,11 @@ export const NoNotifications = () => (
 export const NoPostFound = () => (
   <Message info icon="meh" header="Hey!" content="No Post Found." />
 );
+
+export const MetamaskNotFound = () => (
+  <Message info icon="meh" header="Metamask not detected" content="Metamask extension is mandatory to create/view contracts." />
+);
+
+export const NetworkNotSupported = () => (
+  <Message info icon="meh" header="Network not supported" content="Currently we only support contracts in Rinkeby Test Network(Ethereum) and Mumbai Test Network(Polygon)" />
+);

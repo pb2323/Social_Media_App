@@ -2,17 +2,17 @@ import React, { useEffect, useContext, useState } from "react";
 import { Card, Button } from "semantic-ui-react";
 import ContractFactory from "../../ethereum/factory";
 // import Layout from "../components/Layout";
+import { MetamaskNotFound, NetworkNotSupported } from "../../components/Layout/NoData";
 import { SocketContext } from '../../utils/Context'
 import Link from "next/link";
 import { useRouter } from 'next/router'
 import _ from 'lodash';
 
 function Index({ Wallet }) {
-
   const router = useRouter()
   const [contracts, setContracts] = useState([])
   // const [loading, setLoading] = useState(false)
-  const { wallet, loading, setLoading } = useContext(SocketContext)
+  const { wallet, loading, setLoading, networkSupported, setNetworkSupported, metamaskConnected, setMetamaskConnected } = useContext(SocketContext)
 
   useEffect(() => {
     // const wallet="0x7CC00206d1cFd032f834B3320F47FF64e7A470bF", Wallet="0x7CC00206d1cFd032f834B3320F47FF64e7A470bF"
@@ -21,6 +21,15 @@ function Index({ Wallet }) {
         router.push("/");
         return;
       }
+      if (window.ethereum && window.ethereum.networkVersion) {
+        setMetamaskConnected(true)
+      }
+
+      if (window.ethereum && !(['4', '80001'].includes(window.ethereum.networkVersion))) {
+        setNetworkSupported(false)
+        return
+      }
+
       setLoading(true)
       // console.log('calling');
       const contract = await ContractFactory.methods.getDeployedContract(wallet).call();
@@ -48,9 +57,10 @@ function Index({ Wallet }) {
     return <Card.Group items={items} />;
   }
 
+  if (!metamaskConnected) return (<MetamaskNotFound />)
   return (
     <>
-      {!loading ? <><h3>Contracts</h3>
+      {networkSupported ? (!loading ? <><h3>Contracts</h3>
         <Link href="/contracts/guarantor">
           <Button
             content="View Guarantor Contracts"
@@ -67,7 +77,7 @@ function Index({ Wallet }) {
           />
         </Link>
         {renderContracts()}
-      </> : <></>}
+      </> : <></>) : <NetworkNotSupported />}
     </>
   )
 }

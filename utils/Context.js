@@ -18,6 +18,8 @@ const ContextProvider = ({ children }) => {
     const [wallet, setWallet] = useLocalStorage("wallet", "")
     const [userWallet, setUserWallet] = useLocalStorage("userWallet", "")
     const [loading, setLoading] = useState(false)
+    const [networkSupported, setNetworkSupported] = useState(true)
+    const [metamaskConnected, setMetamaskConnected] = useState(false)
     const myVideo = useRef()
     const userVideo = useRef()
     const connectionRef = useRef()
@@ -121,7 +123,11 @@ const ContextProvider = ({ children }) => {
             setWallet,
             setUserWallet,
             loading,
-            setLoading
+            setLoading,
+            networkSupported,
+            setNetworkSupported,
+            metamaskConnected,
+            setMetamaskConnected
         }}>
             {children}
         </SocketContext.Provider>

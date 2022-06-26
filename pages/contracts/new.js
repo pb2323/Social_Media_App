@@ -1,7 +1,10 @@
 import React, { useState, useContext, useEffect } from "react";
 // import Layout from "../../components/Contracts/Header";
-import { Form, Button, Input, Message } from "semantic-ui-react";
+import { Form, Button, Input, Message, Dropdown } from "semantic-ui-react";
 import factory from "../../ethereum/factory";
+import { rinkebyInstance, polygonInstance } from "../../ethereum/networkFactory";
+import { MetamaskNotFound, NetworkNotSupported } from "../../components/Layout/NoData";
+import { ErrorToastr } from "../../components/Layout/Toastr";
 // import { Router } from "../../routes";
 import { useRouter } from "next/router";
 import { SocketContext } from '../../utils/Context'
@@ -17,8 +20,25 @@ export default function NewPage() {
     const [minimumContribution, setMinimumContribution] = useState("")
     const [guarantorAddress, setGuarantorAddress] = useState("")
     const [errorMessage, setErrorMessage] = useState("")
+    const [toastrMessage, setToastrMessage] = useState("")
     const [loading, setLoading] = useState(false)
-    const { wallet, userWallet } = useContext(SocketContext)
+    const [showToastr, setShowToastr] = useState(false)
+    const options = [
+        {
+            key: "Rinkeby Test Network",
+            value: "Rinkeby Test Network",
+            text: "Rinkeby Test Network"
+        },
+        {
+            key: "Mumbai Test Network",
+            value: "Mumbai Test Network",
+            text: "Mumbai Test Network"
+        }
+    ]
+    const [selectedEnv, setSelectedEnv] = useState(
+        "Mumbai Test Network"
+    )
+    const { wallet, userWallet, metamaskConnected, networkSupported, setMetamaskConnected, setNetworkSupported } = useContext(SocketContext)
 
     useEffect(() => {
         // const wallet="0x7CC00206d1cFd032f834B3320F47FF64e7A470bF", userWallet="0x7CC00206d1cFd032f834B3320F47FF64e7A470bF"
@@ -27,6 +47,16 @@ export default function NewPage() {
                 Router.push("/");
                 return;
             }
+            if (window.ethereum && window.ethereum.networkVersion) {
+                setMetamaskConnected(true)
+            }
+
+            if (window.ethereum && !(['4', '80001'].includes(window.ethereum.networkVersion))) {
+                setNetworkSupported(false)
+                return
+            }
+            if (window.ethereum && window.ethereum.networkVersion == '4')
+                setSelectedEnv("Rinkeby Test Network")
             //   setLoading(true)
             //   console.log('calling');
             //   const contract = await ContractFactory.methods.getDeployedContract(wallet).call();
@@ -39,8 +69,23 @@ export default function NewPage() {
         getContracts();
     }, [])
 
+    useEffect(() => {
+        showToastr && setTimeout(() => setShowToastr(false), 4000);
+    }, [showToastr]);
+
     const onSubmit = async (e) => {
         // this.setState({ loading: true, errorMessage: "" });
+        let factory;
+        if ((window.ethereum.networkVersion == '80001' && selectedEnv === 'Rinkeby Test Network') || (window.ethereum.networkVersion == '4' && selectedEnv === 'Mumbai Test Network')) {
+            setToastrMessage("Metamask network environment and selected enviroment donot match")
+            setShowToastr(true)
+            return
+        }
+        if (!minimumContribution) {
+            setToastrMessage("Minimum Contribution is mandatory field")
+            return
+        }
+        factory = selectedEnv == 'Mumbai Test Network' ? polygonInstance : rinkebyInstance
         setLoading(true)
         setErrorMessage("")
         try {
@@ -62,9 +107,11 @@ export default function NewPage() {
     };
 
     // render() {
+    if (!metamaskConnected) return (<MetamaskNotFound />)
     return (
         <>
             {/* <Layout /> */}
+            {showToastr && <ErrorToastr error={toastrMessage} />}
             <h3>Create a new Contract</h3>
             <Link href="/contracts"><Button style={{ marginTop: '10px', marginBottom: '10px' }} primary>Show Contracts</Button></Link>
             <Form onSubmit={onSubmit} error={!!errorMessage}>
@@ -79,6 +126,21 @@ export default function NewPage() {
                         label="wei"
                         labelPosition="right"
                         type="number"
+                        required
+                    />
+                    <br />
+                    <br />
+                    <label>Blockchain Environment</label>
+                    <Dropdown
+                        placeholder='Select Enviroment'
+                        fluid
+                        selection
+                        options={options}
+                        defaultValue={selectedEnv}
+                        value={selectedEnv}
+                        onChange={(e, data) => {
+                            setSelectedEnv(data.value)
+                        }}
                     />
                     <br />
                     <label>Guarantor Address</label>
