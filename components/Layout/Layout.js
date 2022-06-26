@@ -1,4 +1,4 @@
-import React, { createRef } from "react";
+import React, { createRef, useEffect } from "react";
 import HeadTags from "./HeadTags";
 import Navbar from "./Navbar";
 import {
@@ -35,6 +35,12 @@ function Layout({ children, user }) {
   Router.onRouteChangeStart = () => nprogress.start();
   Router.onRouteChangeComplete = () => nprogress.done();
   Router.onRouteChangeError = () => nprogress.done();
+
+  useEffect(() => {
+    if (window) {
+      ethereum.on("chainChanged", () => Router.reload())
+    }
+  }, [])
 
   return (
     <>
