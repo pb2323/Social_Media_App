@@ -1,9 +1,10 @@
 import React, { useEffect, useContext, useState } from "react";
 import { Card, Button } from "semantic-ui-react";
-import ContractFactory from "../../ethereum/factory";
+// import ContractFactory from "../../ethereum/factory";
 // import Layout from "../components/Layout";
 import { MetamaskNotFound, NetworkNotSupported } from "../../components/Layout/NoData";
 import { SocketContext } from '../../utils/Context'
+import { rinkebyInstance, polygonInstance } from "../../ethereum/networkFactory";
 import Link from "next/link";
 import { useRouter } from 'next/router'
 import _ from 'lodash';
@@ -33,6 +34,7 @@ function Index({ Wallet }) {
 
       setLoading(true)
       // console.log('calling');
+      const ContractFactory = networkVersion == '4' ? rinkebyInstance : polygonInstance
       const contract = await ContractFactory.methods.getDeployedContract(wallet).call();
       // console.log(contract);
       const userContract = await ContractFactory.methods.getDeployedContract(Wallet).call();

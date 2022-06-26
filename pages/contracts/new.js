@@ -109,6 +109,7 @@ export default function NewPage() {
 
     // render() {
     if (!metamaskConnected) return (<MetamaskNotFound />)
+    if (!networkSupported) return (<NetworkNotSupported />)
     return (
         <>
             {/* <Layout /> */}
