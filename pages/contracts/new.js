@@ -47,15 +47,16 @@ export default function NewPage() {
                 Router.push("/");
                 return;
             }
-            if (window.ethereum && window.ethereum.networkVersion) {
+            const isMetamaskConnected = await ethereum?._metamask?.isUnlocked();
+            if (isMetamaskConnected) {
                 setMetamaskConnected(true)
             }
-
-            if (window.ethereum && !(['4', '80001'].includes(window.ethereum.networkVersion))) {
+            const networkVersion = await ethereum?.request({ method: 'net_version' })
+            if (window.ethereum && !(['4', '80001'].includes(networkVersion))) {
                 setNetworkSupported(false)
                 return
             }
-            if (window.ethereum && window.ethereum.networkVersion == '4')
+            if (window.ethereum && networkVersion == '4')
                 setSelectedEnv("Rinkeby Test Network")
             //   setLoading(true)
             //   console.log('calling');
