@@ -34,10 +34,6 @@ The whole project is created using Javascript language. Particularly for the bac
 
 * We can use our contract feature in a Saas model and can integrate it to existing centralized platform/competitors and charge them for every contract created or a percentage or ether staked.
 
-# Website
-
-https://network-in.herokuapp.com/
-
 # Presentation
 
 https://docs.google.com/presentation/d/1ADW5qzt_3H7majuTGdy31IFyhwUGgNjuL7Qmsmpzdk4/edit?usp=sharing
