@@ -37,3 +37,7 @@ The whole project is created using Javascript language. Particularly for the bac
 # Website
 
 https://network-in.herokuapp.com/
+
+# Presentation
+
+https://docs.google.com/presentation/d/1ADW5qzt_3H7majuTGdy31IFyhwUGgNjuL7Qmsmpzdk4/edit?usp=sharing
