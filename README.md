@@ -5,7 +5,9 @@
 
 # Website
 
-https://network-in-25db1b54cfae.herokuapp.com/
+https://network-in-25db1b54cfae.herokuapp.com
+
+Note: Metamask extension is mandatory to use this platform
 
 # What is this?
 A social media platform for freelancers where:
@@ -18,11 +20,13 @@ A social media platform for freelancers where:
 
 * Receive notifications of activities in their profile.
 
-* Create a smart contract where the client has to stake freelancer’s fees and the freelancer has to stake half of the amount client staked, which will be stored in the smart contract, until the project is done, as a guarantee from both the parties. Funds can also be transferred partly/fully, the freelancer can add a request for transfer (disabled for client) which has to be approved by the client(disabled for freelancer) for transfer of the assets.
+* Create a smart contract that requires the client to stake the freelancer's fees, and the freelancer to stake half of the amount the client staked. This amount will be stored in the smart contract as a guarantee from both parties until the project is completed. The funds can be transferred either partly or in full. The freelancer can request a transfer, which the client can approve, and the assets will be transferred accordingly. The client cannot request a transfer, and the freelancer cannot approve any transfer requests.
 
-* In addition to this, if there is a conflict between the client and the freelancer, and none of them agrees to a settlement, the client can nominate a guarantor, based on their mutual discussion, who has the ability for both, creating a request as well as approving it, who can decide the final conclusion for the conflict.
+* Furthermore, in case of a dispute between the client and the freelancer that cannot be resolved by mutual agreement, the client may choose a guarantor with whom they have mutually agreed. The guarantor will have the authority to raise and approve requests and make the final decision to resolve the conflict.
 
 * Supporting two major blockchains currently: a) Ethereum b) Polygon
+
+Update: Ethereum Rinkeby test network is deprecated on October 2022 and only polygon test network is supported currently
 
 # Tech Stack
 
