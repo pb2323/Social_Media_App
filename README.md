@@ -1,4 +1,4 @@
-# Network-In: Social Media Platform for freelancers
+# Network-In: Social Networking Platform for freelancers
 <p align="center">
 <img src="https://user-images.githubusercontent.com/60563310/188317177-dcd19177-458e-4580-9bbe-8602bb368378.jpeg"/>
 </p>
@@ -10,7 +10,7 @@ https://network-in-25db1b54cfae.herokuapp.com
 Note: Metamask extension is mandatory to use this platform
 
 # What is this?
-A social media platform for freelancers where:
+A social networking platform for freelancers where:
 
 * Users will be able to post pictures, status, like, and comment on pictures.
 
