@@ -27,7 +27,7 @@ function Index({ Wallet }) {
         setMetamaskConnected(true)
       }
       const networkVersion = await ethereum?.request({ method: 'net_version' })
-      if (window.ethereum && !(['4', '80001'].includes(networkVersion))) {
+      if (window.ethereum && !(['80002'].includes(networkVersion))) {
         setNetworkSupported(false)
         return
       }
@@ -35,15 +35,15 @@ function Index({ Wallet }) {
       setLoading(true)
       // console.log('calling');
       const ContractFactory = networkVersion == '4' ? rinkebyInstance : polygonInstance
-      const contract = await ContractFactory.methods.getDeployedContract(wallet).call();
+      const contract = await ContractFactory.methods.getDeployedContracts(wallet).call();
       // console.log(contract);
-      const userContract = await ContractFactory.methods.getDeployedContract(Wallet).call();
+      const userContract = await ContractFactory.methods.getDeployedContracts(Wallet).call();
       const intersection = _.intersection(contract, userContract);
       setLoading(false)
       setContracts(intersection)
     }
     getContracts();
-  }, [])
+  }, [wallet, Wallet, router, setLoading, setMetamaskConnected, setNetworkSupported])
   // console.log(loading)
   const renderContracts = () => {
     const items = contracts.map((address) => {

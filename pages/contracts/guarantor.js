@@ -15,6 +15,7 @@ function Guarantor({ Wallet }) {
     const { wallet, loading, setLoading } = useContext(SocketContext)
 
     useEffect(() => {
+        if (typeof window === 'undefined') return;
         // const wallet="0x7CC00206d1cFd032f834B3320F47FF64e7A470bF", Wallet="0x7CC00206d1cFd032f834B3320F47FF64e7A470bF"
         const getContracts = async () => {
             //   if (!wallet || !Wallet) {

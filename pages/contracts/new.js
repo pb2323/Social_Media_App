@@ -1,7 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 // import Layout from "../../components/Contracts/Header";
 import { Form, Button, Input, Message, Dropdown } from "semantic-ui-react";
-import factory from "../../ethereum/factory";
 import { rinkebyInstance, polygonInstance } from "../../ethereum/networkFactory";
 import { MetamaskNotFound, NetworkNotSupported } from "../../components/Layout/NoData";
 import { ErrorToastr } from "../../components/Layout/Toastr";
@@ -30,13 +29,13 @@ export default function NewPage() {
             text: "Rinkeby Test Network"
         },
         {
-            key: "Mumbai Test Network",
-            value: "Mumbai Test Network",
-            text: "Mumbai Test Network"
+            key: "Amoy Test Network",
+            value: "Amoy Test Network",
+            text: "Amoy Test Network"
         }
     ]
     const [selectedEnv, setSelectedEnv] = useState(
-        "Mumbai Test Network"
+        "Amoy Test Network"
     )
     const { wallet, userWallet, metamaskConnected, networkSupported, setMetamaskConnected, setNetworkSupported } = useContext(SocketContext)
 
@@ -52,7 +51,7 @@ export default function NewPage() {
                 setMetamaskConnected(true)
             }
             const networkVersion = await ethereum?.request({ method: 'net_version' })
-            if (window.ethereum && !(['4', '80001'].includes(networkVersion))) {
+            if (window.ethereum && !(['4', '80002'].includes(networkVersion))) {
                 setNetworkSupported(false)
                 return
             }
@@ -68,7 +67,7 @@ export default function NewPage() {
             //   setContracts(contract)
         }
         getContracts();
-    }, [])
+    }, [wallet, userWallet, Router, setMetamaskConnected, setNetworkSupported])
 
     useEffect(() => {
         showToastr && setTimeout(() => setShowToastr(false), 4000);
@@ -77,8 +76,8 @@ export default function NewPage() {
     const onSubmit = async (e) => {
         // this.setState({ loading: true, errorMessage: "" });
         let factory;
-        if ((window.ethereum.networkVersion == '80001' && selectedEnv === 'Rinkeby Test Network') || (window.ethereum.networkVersion == '4' && selectedEnv === 'Mumbai Test Network')) {
-            setToastrMessage("Metamask network environment and selected enviroment donot match")
+        if ((window.ethereum.networkVersion == '80002' && selectedEnv === 'Rinkeby Test Network') || (window.ethereum.networkVersion == '4' && selectedEnv === 'Amoy Test Network')) {
+            setToastrMessage("Metamask network environment and selected environment don't match")
             setShowToastr(true)
             return
         }
@@ -86,7 +85,7 @@ export default function NewPage() {
             setToastrMessage("Minimum Contribution is mandatory field")
             return
         }
-        factory = selectedEnv == 'Mumbai Test Network' ? polygonInstance : rinkebyInstance
+        factory = selectedEnv === 'Rinkeby Test Network' ? rinkebyInstance : polygonInstance
         setLoading(true)
         setErrorMessage("")
         try {
@@ -96,7 +95,7 @@ export default function NewPage() {
             });
 
             await factory.methods
-                .createContract(minimumContribution, wallet, !!guarantorAddress ? guarantorAddress : "0x10f771b16cA7F39d78573F55826c7D8d42C0C195")
+                .createContract(minimumContribution, wallet, !!guarantorAddress ? guarantorAddress : "0x2796468D40a0458C301c7e1E99cB7226c5682d07")
                 .send({ from: accounts[0] });
             Router.push("/contracts");
         } catch (err) {
@@ -134,7 +133,7 @@ export default function NewPage() {
                     <br />
                     <label>Blockchain Environment</label>
                     <Dropdown
-                        placeholder='Select Enviroment'
+                        placeholder='Select Environment'
                         fluid
                         selection
                         options={options}

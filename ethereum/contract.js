@@ -1,12 +1,12 @@
-import web3 from "./web3";
-import SmartContract from "./build/SmartContract.json";
+const web3 = require("./web3");
+const SmartContract = require("./build/SmartContract.json");
 
 const SmartContractInstance = (address) => {
   const instance = new web3.eth.Contract(
-    JSON.parse(SmartContract.interface),
+    SmartContract.abi,
     address
   );
   return instance;
 };
 
-export default SmartContractInstance;
+module.exports = SmartContractInstance;
